@@ -26,15 +26,52 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
 
-## Issues Naming
+## How To Create New Issue
+
+### Title (with prefix)
 
 1. NFR = New Feature Request
 2. NR = Need Review
 3. NI = Need Improvement
-4. NR = Need Review
-5. BE = Backend
-6. FE = Frontend
-7. UI/UX
-8. HLA = High Level Architecture
-9. BUGFIX
-10. HOTFIX
+4. BE = Backend
+5. FE = Frontend
+6. UI/UX
+7. HLA = High Level Architecture
+8. BUGFIX
+9. HOTFIX
+
+Example:
+
+```bash
+[NFR] Signup Page
+[BUGFIX] Signup => Submit functionality
+[NI] Login => Input text size
+```
+
+### Description
+
+Issue description consists of 3 informations:
+
+1. Design Picture (Optional)
+2. Description (Description detail of the issue, Required)
+3. Branch (Branch name of the issue, Not required if the branch is exist)
+
+Example:
+
+==================================================================
+
+## Design
+
+No design
+
+## Description
+
+Create new login page with login functionality
+
+## Branch
+
+```bash
+$ git checkout feature/login
+```
+
+==================================================================
