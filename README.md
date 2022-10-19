@@ -72,6 +72,24 @@ Create new login page with login functionality
 
 ```bash
 $ git checkout feature/login
+> Switched to branch 'feature/login'
 ```
 
 ==================================================================
+
+## How To Naming Branch
+
+There are several types of branch:
+
+1. feature: A new feature
+2. bugfix: A fix for issues found through development lifecycle
+3. hotfix: A fix on live, active apps, zero to minimal downtime for users
+4. coldfix: A fix on live, active apps, visible impact via downtime or system restarts
+
+Example:
+
+```bash
+feature/prescription-update
+bugfix/signup-submit
+hotfix/diagnose-crud
+```
