@@ -1,9 +1,9 @@
-name: Deploy Staging
+name: Deploy Dev
 
 on:
   push:
     branches:
-      - staging
+      - dev
 
 jobs:
   ci:
