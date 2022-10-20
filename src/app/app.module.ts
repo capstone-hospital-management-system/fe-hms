@@ -8,12 +8,11 @@ import { AppRoutingModule } from './app-routing.module';
 import { HttpInterceptorInterceptor } from './core/interceptor/http-interceptor.interceptor';
 import { AppComponent } from './app.component';
 import { ErrorPageComponent } from './core/pages/error-page/error-page.component';
-import { AuthLayoutComponent } from './core/layout/auth-layout/auth-layout.component';
-import { DashboardLayoutComponent } from './core/layout/dashboard-layout/dashboard-layout.component';
+import { LayoutModule } from './core/layout/layout.module';
 
 @NgModule({
-  declarations: [AppComponent, ErrorPageComponent, AuthLayoutComponent, DashboardLayoutComponent],
-  imports: [BrowserModule, BrowserAnimationsModule, AppRoutingModule],
+  declarations: [AppComponent, ErrorPageComponent],
+  imports: [BrowserModule, BrowserAnimationsModule, AppRoutingModule, LayoutModule],
   providers: [
     { provide: LocationStrategy, useClass: HashLocationStrategy },
     {
