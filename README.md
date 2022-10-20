@@ -60,6 +60,7 @@ Example:
 
 ==================================================================
 
+```text
 ## Design
 
 No design
@@ -70,9 +71,7 @@ Create new login page with login functionality
 
 ## Branch
 
-```bash
 $ git checkout feature/login
-> Switched to branch 'feature/login'
 ```
 
 ==================================================================
