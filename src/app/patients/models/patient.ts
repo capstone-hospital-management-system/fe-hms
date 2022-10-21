@@ -1,11 +1,4 @@
-interface IField {
-  key: string;
-  label: string;
-  placeholder: string;
-  type: string;
-  isRequired: boolean;
-  regexPattern: string;
-}
+import { IField } from 'src/app/core/dtos/IFields';
 
 export const patientFields: IField[] = [
   {
