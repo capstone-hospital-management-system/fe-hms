@@ -1,0 +1,373 @@
+<p-toast></p-toast>
+<p-confirmDialog [baseZIndex]="3" styleClass="md:max-w-[30vw]"></p-confirmDialog>
+
+<div class="container p-5">
+  <div class="flex mb-5">
+    <div class="mr-4">
+      <button
+        pButton
+        label="New Patient"
+        icon="pi pi-plus"
+        class="p-button-success p-button-sm"
+        (click)="onAddPreview()"></button>
+    </div>
+    <div *ngIf="false" class="mr-auto">
+      <button pButton label="Bulk Delete" icon="pi pi-trash" class="p-button-danger p-button-sm"></button>
+    </div>
+    <button pButton label="Export" icon="pi pi-upload" class="p-button-help p-button-sm" (click)="onExport()"></button>
+  </div>
+
+  <p-table
+    #dt
+    dataKey="id"
+    responsiveLayout="scroll"
+    [value]="patients"
+    [rows]="perPage"
+    [rowHover]="!isPatientListLoading"
+    [rowsPerPageOptions]="[5, 10, 25, 50, 100]">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="text-sm">ID</th>
+        <th class="text-sm">Username</th>
+        <th class="text-sm">Firstname</th>
+        <th class="text-sm">Lastname</th>
+        <th class="text-sm">ID Card</th>
+        <th class="text-sm">Age</th>
+        <th class="text-sm">Gender</th>
+        <th class="text-sm">Blood Type</th>
+        <th class="text-sm">BOD</th>
+        <th class="text-sm">Phone</th>
+        <th class="text-sm">Address</th>
+        <th class="text-sm">City</th>
+        <th class="text-sm">Postal Code</th>
+        <th class="text-sm">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-patient>
+      <tr *ngIf="isPatientListLoading">
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+      </tr>
+
+      <tr *ngIf="!isPatientListLoading">
+        <td class="text-sm">
+          {{ patient.id }}
+        </td>
+        <td class="text-sm">
+          {{ patient.username }}
+        </td>
+        <td class="text-sm">
+          {{ patient.first_name }}
+        </td>
+        <td class="text-sm">
+          {{ patient.last_name }}
+        </td>
+        <td class="text-sm">
+          {{ patient.id_card }}
+        </td>
+        <td class="text-sm">
+          {{ patient.age }}
+        </td>
+        <td class="text-sm">
+          {{ patient.gender }}
+        </td>
+        <td class="text-sm">
+          {{ patient.blood_type }}
+        </td>
+        <td class="text-sm">
+          {{ patient.bod | date: 'dd LLL yyyy' }}
+        </td>
+        <td class="text-sm">
+          {{ patient.phone_number }}
+        </td>
+        <td class="text-sm">
+          {{ patient.address }}
+        </td>
+        <td class="text-sm">
+          {{ patient.city }}
+        </td>
+        <td class="text-sm">
+          {{ patient.postal_code }}
+        </td>
+        <td>
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-warning p-button-sm mr-2"
+            [loading]="patient.id === selectedPatientId && isPatientDetailLoading"
+            (click)="onEditPreview(patient)"></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-danger p-button-sm"
+            [disabled]="isDeleteLoading"
+            [loading]="patient.id === selectedPatientId && isDeleteLoading"
+            (click)="onDeletePreview(patient.id)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-paginator
+    class="custom-pagination"
+    styleClass="mt-4"
+    [rows]="perPage"
+    [totalRecords]="totalData"
+    [rowsPerPageOptions]="[5, 10, 25, 50, 100]"
+    (onPageChange)="onChangePage($event)"></p-paginator>
+
+  <p-dialog
+    [header]="selectedPatientId ? 'Edit Patient' : 'New Patient'"
+    position="top"
+    responsiveLayout="scroll"
+    [(visible)]="isPatientFormVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="!isSubmitLoading"
+    [style]="{ width: '35vw' }"
+    (onHide)="onHideForm()">
+    <form [formGroup]="patientForm" style="padding-top: 1px" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <p class="text-sm mb-2">Username</p>
+        <input
+          formControlName="username"
+          id="username"
+          type="text"
+          pInputText
+          placeholder="Username"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['username'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && patientForm.controls['username'].errors" id="username" class="p-error block mt-1">
+          Username is required!
+        </small>
+      </div>
+
+      <div class="field mt-4">
+        <p class="text-sm mb-2">Firstname</p>
+        <input
+          formControlName="first_name"
+          id="first_name"
+          type="text"
+          pInputText
+          placeholder="Firstname"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['first_name'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small
+          *ngIf="isSubmitted && patientForm.controls['first_name'].errors"
+          id="first_name"
+          class="p-error block mt-1">
+          Firstname is required!
+        </small>
+      </div>
+
+      <div class="field mt-4">
+        <p class="text-sm mb-2">Lastname</p>
+        <input
+          formControlName="last_name"
+          id="last_name"
+          type="text"
+          pInputText
+          placeholder="Lastname"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['last_name'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small
+          *ngIf="isSubmitted && patientForm.controls['last_name'].errors"
+          id="last_name"
+          class="p-error block mt-1">
+          Lastname is required!
+        </small>
+      </div>
+
+      <div class="field mt-4">
+        <p class="text-sm mb-2">ID Card</p>
+        <input
+          formControlName="id_card"
+          id="id_card"
+          type="text"
+          pInputText
+          placeholder="ID Card"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['id_card'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && patientForm.controls['id_card'].errors" id="id_card" class="p-error block mt-1">
+          ID Card is required!
+        </small>
+      </div>
+
+      <div class="field mt-4">
+        <p class="text-sm mb-2">Age</p>
+        <input
+          formControlName="age"
+          id="age"
+          type="text"
+          pInputText
+          placeholder="Age"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['age'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && patientForm.controls['age'].errors" id="age" class="p-error block mt-1">
+          Age is required!
+        </small>
+      </div>
+
+      <div class="field mt-4">
+        <p class="text-sm mb-2">Gender</p>
+        <input
+          formControlName="gender"
+          id="gender"
+          type="text"
+          pInputText
+          placeholder="Gender"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['gender'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && patientForm.controls['gender'].errors" id="gender" class="p-error block mt-1">
+          Gender is required!
+        </small>
+      </div>
+
+      <div class="field mt-4">
+        <p class="text-sm mb-2">Blood Type</p>
+        <input
+          formControlName="blood_type"
+          id="blood_type"
+          type="text"
+          pInputText
+          placeholder="Blood Type"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['blood_type'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small
+          *ngIf="isSubmitted && patientForm.controls['blood_type'].errors"
+          id="blood_type"
+          class="p-error block mt-1">
+          Blood Type is required!
+        </small>
+      </div>
+
+      <div class="field mt-4">
+        <p class="text-sm mb-2">Date of Birth</p>
+        <p-calendar
+          formControlName="bod"
+          dateFormat="dd-mm-yy"
+          placeholder="Date of Birth"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['bod'].errors
+          }"
+          class="p-calendar-sm w-full"></p-calendar>
+        <small *ngIf="isSubmitted && patientForm.controls['bod'].errors" id="bod" class="p-error block mt-1">
+          Date of Birth is required!
+        </small>
+      </div>
+
+      <div class="field mt-4">
+        <p class="text-sm mb-2">Phone</p>
+        <input
+          formControlName="phone_number"
+          id="phone_number"
+          type="text"
+          pInputText
+          placeholder="Phone"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['phone_number'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small
+          *ngIf="isSubmitted && patientForm.controls['phone_number'].errors"
+          id="phone_number"
+          class="p-error block mt-1">
+          Phone is required!
+        </small>
+      </div>
+
+      <div class="field mt-4">
+        <p class="text-sm mb-2">Address</p>
+        <textarea
+          pInputTextarea
+          formControlName="address"
+          id="address"
+          type="text"
+          [rows]="5"
+          [cols]="30"
+          placeholder="Address"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['address'].errors
+          }"
+          class="p-inputtext-sm w-full"></textarea>
+        <small *ngIf="isSubmitted && patientForm.controls['address'].errors" id="address" class="p-error block">
+          Address is required!
+        </small>
+      </div>
+
+      <div class="field mt-3">
+        <p class="text-sm mb-2">City</p>
+        <input
+          formControlName="city"
+          id="city"
+          type="text"
+          pInputText
+          placeholder="City"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['city'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && patientForm.controls['city'].errors" id="city" class="p-error block mt-1">
+          City is required!
+        </small>
+      </div>
+
+      <div class="field mt-4">
+        <p class="text-sm mb-2">Postal Code</p>
+        <input
+          formControlName="postal_code"
+          id="postal_code"
+          type="text"
+          pInputText
+          placeholder="Postal Code"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && patientForm.controls['postal_code'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small
+          *ngIf="isSubmitted && patientForm.controls['postal_code'].errors"
+          id="postal_code"
+          class="p-error block mt-1">
+          Postal Code is required!
+        </small>
+      </div>
+
+      <div class="text-end mt-7">
+        <button
+          pButton
+          label="Save"
+          type="submit"
+          class="p-button-primary p-button-sm py-2 px-10"
+          [loading]="isSubmitLoading"></button>
+      </div>
+    </form>
+  </p-dialog>
+</div>

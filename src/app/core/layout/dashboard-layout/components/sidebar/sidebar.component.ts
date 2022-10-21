@@ -31,16 +31,16 @@ export class SidebarComponent {
     //   icon: 'pi pi-chart-bar',
     //   title: 'Transactions',
     // },
-    // {
-    //   url: '/dashboard/admins',
-    //   routerLinkActiveOptions: defaultRouterLinkActiveOptions,
-    //   queryParams: {
-    //     page: 1,
-    //     per_page: 5,
-    //   },
-    //   icon: 'pi pi-users',
-    //   title: 'Admins',
-    // },
+    {
+      url: '/dashboard/patients',
+      routerLinkActiveOptions: defaultRouterLinkActiveOptions,
+      queryParams: {
+        page: 1,
+        per_page: 5,
+      },
+      icon: 'pi pi-users',
+      title: 'Patients',
+    },
   ];
 
   constructor() {}
