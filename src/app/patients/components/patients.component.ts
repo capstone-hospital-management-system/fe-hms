@@ -17,6 +17,7 @@ import { CalendarModule } from 'primeng/calendar';
 
 import { IPatientRequestDTO, IPatientResponseDTO } from '../dtos/IPatientDTO';
 import { PatientsService } from '../services/patients.service';
+import { patientFields } from '../models/patient';
 
 @Component({
   selector: 'app-patients',
@@ -41,23 +42,7 @@ import { PatientsService } from '../services/patients.service';
 })
 export class PatientsComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
-  patientForm: FormGroup = new FormGroup({
-    username: new FormControl('', Validators.required),
-    first_name: new FormControl('', Validators.required),
-    last_name: new FormControl('', Validators.required),
-    id_card: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
-    age: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
-    gender: new FormControl('', Validators.required),
-    address: new FormControl('', Validators.required),
-    city: new FormControl('', Validators.required),
-    blood_type: new FormControl('', Validators.required),
-    bod: new FormControl('', Validators.required),
-    phone_number: new FormControl('', Validators.required),
-    postal_code: new FormControl('', Validators.required),
-    register_date: new FormControl(new Date(), Validators.required),
-    register_by: new FormControl('', Validators.required),
-    updated_by: new FormControl('', Validators.required),
-  });
+  patientForm: FormGroup = new FormGroup({});
   isPatientFormVisible: boolean = false;
   patients: IPatientResponseDTO[] = [];
   selectedPatientId: number | undefined;
@@ -81,6 +66,17 @@ export class PatientsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    patientFields.forEach(field => {
+      const formControl: FormControl = new FormControl('');
+      if (field.isRequired) {
+        formControl.addValidators(Validators.required);
+      }
+      if (field.regexPattern) {
+        formControl.addValidators(Validators.pattern(field.regexPattern));
+      }
+      this.patientForm.addControl(field.key, formControl);
+    });
+
     let queryParams = {};
     this.activatedRoute.queryParams.subscribe(params => {
       queryParams = params;
