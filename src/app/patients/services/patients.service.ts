@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class PatientsService {
-  url: string = `${environment.baseUrl}/patients`;
+  private url: string = `${environment.baseUrl}/patients`;
 
   constructor(private http: HttpClient) {}
 

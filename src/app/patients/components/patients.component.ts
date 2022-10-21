@@ -224,7 +224,8 @@ export class PatientsComponent implements OnInit {
         });
         this.onGetPatients();
       },
-      complete: () => {
+      error: error => {
+        console.log(error);
         this.isSubmitLoading = false;
       },
     });
