@@ -21,3 +21,5 @@ export interface IPatientResponseDTO extends IPatient {
   created_at: string | Date;
   updated_at: string | Date;
 }
+
+export interface IPatientRequestDTO extends IPatient {}

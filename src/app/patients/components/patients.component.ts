@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -14,7 +15,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CalendarModule } from 'primeng/calendar';
 
-import { IPatientResponseDTO } from '../dtos/IPatientDTO';
+import { IPatientRequestDTO, IPatientResponseDTO } from '../dtos/IPatientDTO';
+import { PatientsService } from '../services/patients.service';
 
 @Component({
   selector: 'app-patients',
@@ -35,10 +37,10 @@ import { IPatientResponseDTO } from '../dtos/IPatientDTO';
     InputTextareaModule,
     CalendarModule,
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, PatientsService],
 })
 export class PatientsComponent implements OnInit {
-  // private ngUnsubsribe: Subject<any> = new Subject();
+  private ngUnsubsribe: Subject<any> = new Subject();
   patientForm: FormGroup = new FormGroup({
     username: new FormControl('', Validators.required),
     first_name: new FormControl('', Validators.required),
@@ -73,9 +75,9 @@ export class PatientsComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private formBuilder: FormBuilder,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private patientsService: PatientsService
   ) {}
 
   ngOnInit(): void {
@@ -87,16 +89,21 @@ export class PatientsComponent implements OnInit {
   }
 
   onGetPatients(params?: { [key: string]: string | number }): void {
-    // this.isPatientListLoading = true;
-    // this.patientsService
-    //   .httpGetPatients(params)
-    //   .pipe(takeUntil(this.ngUnsubsribe))
-    //   .subscribe(res => {
-    //     this.patients = res.data;
-    //     this.totalData = res.meta.total_data;
-    //     this.isPatientListLoading = false;
-    //   });
-    // console.log(params);
+    const queryParams = params ?? { page: this.currentPage, per_page: this.perPage };
+    this.isPatientListLoading = true;
+    this.patientsService
+      .get(queryParams)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.patients = res.data;
+          this.totalData = res.meta?.total_data as number;
+        },
+        error: error => {
+          console.error(error);
+          this.isPatientListLoading = false;
+        },
+      });
 
     // Hanya untuk testing
     this.patients = [
@@ -124,6 +131,8 @@ export class PatientsComponent implements OnInit {
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
+    this.currentPage = pagination.page + 1;
+    this.perPage = pagination.rows;
     let queryParams: { page: number; per_page: number; sort?: string } = {
       page: pagination.page + 1,
       per_page: pagination.rows,
@@ -141,14 +150,14 @@ export class PatientsComponent implements OnInit {
     this.isSubmitted = false;
   }
 
-  onExport(): void {
-    // this.patientsService
-    //   .httpGetPatientExcel()
-    //   .pipe(takeUntil(this.ngUnsubsribe))
-    //   .subscribe(blob => {
-    //     saveAs(blob, 'patients.xlsx');
-    //   });
-  }
+  // onExport(): void {
+  //   this.patientsService
+  //     .httpGetPatientExcel()
+  //     .pipe(takeUntil(this.ngUnsubsribe))
+  //     .subscribe(blob => {
+  //       saveAs(blob, 'patients.xlsx');
+  //     });
+  // }
 
   onAddPreview(): void {
     this.onToggleForm();
@@ -172,20 +181,24 @@ export class PatientsComponent implements OnInit {
       acceptLabel: 'Delete',
       acceptButtonStyleClass: 'p-button-outlined p-button-danger p-button-sm',
       accept: () => {
-        // this.isDeleteLoading = true;
-        // this.patientsService
-        //   .httpDeletePatient(id)
-        //   .pipe(takeUntil(this.ngUnsubsribe))
-        //   .subscribe(() => {
-        //     this.isDeleteLoading = false;
-        //     this.messageService.add({
-        //       severity: 'success',
-        //       summary: 'Success',
-        //       detail: 'Patient Deleted!',
-        //     });
-        //     this.selectedPatientId = undefined;
-        //     this.onGetPatients();
-        //   });
+        this.isDeleteLoading = true;
+        this.patientsService
+          .delete(id)
+          .pipe(takeUntil(this.ngUnsubsribe))
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Patient Deleted!',
+              });
+              this.selectedPatientId = undefined;
+              this.onGetPatients();
+            },
+            complete: () => {
+              this.isDeleteLoading = false;
+            },
+          });
       },
       rejectLabel: 'Cancel',
       rejectButtonStyleClass: 'p-button-primary p-button-sm',
@@ -197,24 +210,27 @@ export class PatientsComponent implements OnInit {
 
   onSubmit() {
     this.isSubmitted = true;
-    console.log(this.patientForm.value);
-    // if (this.patientForm.invalid) return;
-    // this.isSubmitLoading = true;
-    // const payload: IPatient = this.patientForm.value;
-    // const httpSubmitService = this.selectedPatient
-    //   ? this.patientsService.httpUpdatePatient(this.selectedPatient.id, payload)
-    //   : this.patientsService.httpCreatePatient(payload);
-    // httpSubmitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe(() => {
-    //   this.isSubmitted = false;
-    //   this.isSubmitLoading = false;
-    //   this.onToggleForm();
-    //   this.patientForm.reset();
-    //   this.messageService.add({
-    //     severity: 'success',
-    //     summary: 'Success',
-    //     detail: this.selectedPatient ? 'Patient Updated!' : 'Patient Created!',
-    //   });
-    //   this.onGetPatients();
-    // });
+    if (this.patientForm.invalid) return;
+    this.isSubmitLoading = true;
+    const payload: IPatientRequestDTO = this.patientForm.value;
+    const submitService = this.selectedPatientId
+      ? this.patientsService.update(this.selectedPatientId, payload)
+      : this.patientsService.create(payload);
+    submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
+      next: () => {
+        this.isSubmitted = false;
+        this.onToggleForm();
+        this.patientForm.reset();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: this.selectedPatientId ? 'Patient Updated!' : 'Patient Created!',
+        });
+        this.onGetPatients();
+      },
+      complete: () => {
+        this.isSubmitLoading = false;
+      },
+    });
   }
 }

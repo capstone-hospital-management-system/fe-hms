@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { SessionService } from 'src/app/auth/services/session/session.service';
 
 @Injectable()
-export class HttpInterceptorInterceptor implements HttpInterceptor {
+export class HttpSessionInterceptor implements HttpInterceptor {
   constructor(private sessionService: SessionService) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
