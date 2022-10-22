@@ -41,6 +41,16 @@ export class SidebarComponent {
       icon: 'pi pi-tags',
       title: 'Medicines',
     },
+    {
+      url: '/dashboard/prescriptions',
+      routerLinkActiveOptions: defaultRouterLinkActiveOptions,
+      queryParams: {
+        page: 1,
+        per_page: 5,
+      },
+      icon: 'pi pi-tags',
+      title: 'Prescriptions',
+    },
   ];
 
   constructor() {}

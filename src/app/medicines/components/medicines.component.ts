@@ -207,7 +207,7 @@ export class MedicinesComponent implements OnInit {
         this.onGetMedicines();
       },
       error: error => {
-        console.log(error);
+        console.error(error);
         this.isSubmitLoading = false;
       },
     });

@@ -10,7 +10,7 @@ import { IMedicineRequestDTO, IMedicineResponseDTO } from '../dtos/IMedicinesDTO
   providedIn: 'root',
 })
 export class MedicinesService {
-  private url: string = `${environment.baseUrl}/patients`;
+  private url: string = `${environment.baseUrl}/medicines`;
 
   constructor(private http: HttpClient) {}
 
