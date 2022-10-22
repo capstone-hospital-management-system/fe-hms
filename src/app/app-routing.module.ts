@@ -36,6 +36,11 @@ import { DashboardLayoutComponent } from './core/layout/dashboard-layout/dashboa
               title: 'Patients',
               loadComponent: () => import('./patients/components/patients.component').then(m => m.PatientsComponent),
             },
+            {
+              path: 'medicines',
+              title: 'Medicines',
+              loadComponent: () => import('./medicines/components/medicines.component').then(m => m.MedicinesComponent),
+            },
           ],
         },
         { path: 'error-page', component: ErrorPageComponent },

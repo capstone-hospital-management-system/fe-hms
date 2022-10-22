@@ -21,16 +21,6 @@ export class SidebarComponent {
       icon: 'pi pi-home',
       title: 'Homepage',
     },
-    // {
-    //   url: '/dashboard/transactions',
-    //   routerLinkActiveOptions: defaultRouterLinkActiveOptions,
-    //   queryParams: {
-    //     page: 1,
-    //     per_page: 5,
-    //   },
-    //   icon: 'pi pi-chart-bar',
-    //   title: 'Transactions',
-    // },
     {
       url: '/dashboard/patients',
       routerLinkActiveOptions: defaultRouterLinkActiveOptions,
@@ -40,6 +30,16 @@ export class SidebarComponent {
       },
       icon: 'pi pi-users',
       title: 'Patients',
+    },
+    {
+      url: '/dashboard/medicines',
+      routerLinkActiveOptions: defaultRouterLinkActiveOptions,
+      queryParams: {
+        page: 1,
+        per_page: 5,
+      },
+      icon: 'pi pi-tags',
+      title: 'Medicines',
     },
   ];
 

@@ -18,8 +18,8 @@ export interface IPatient {
 
 export interface IPatientResponseDTO extends IPatient {
   id: number;
-  created_at: string | Date;
-  updated_at: string | Date;
+  created_at: number | Date;
+  updated_at: number | Date;
 }
 
 export interface IPatientRequestDTO extends IPatient {}

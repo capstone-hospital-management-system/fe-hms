@@ -12,17 +12,18 @@ import { ButtonModule } from 'primeng/button';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CalendarModule } from 'primeng/calendar';
 
-import { IPatientRequestDTO, IPatientResponseDTO } from '../dtos/IPatientsDTO';
-import { PatientsService } from '../services/patients.service';
-import { patientFields } from '../models/patients';
+import { MedicinesService } from '../services/medicines.service';
+import { IMedicineRequestDTO, IMedicineResponseDTO } from '../dtos/IMedicinesDTO';
+import { medicineFields } from '../models/medicines';
 
 @Component({
-  selector: 'app-patients',
-  templateUrl: './patients.component.html',
-  styleUrls: ['./patients.component.scss'],
+  selector: 'app-medicines',
+  templateUrl: './medicines.component.html',
+  styleUrls: ['./medicines.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -35,21 +36,22 @@ import { patientFields } from '../models/patients';
     DialogModule,
     ReactiveFormsModule,
     InputTextModule,
+    InputNumberModule,
     InputTextareaModule,
     CalendarModule,
   ],
-  providers: [MessageService, ConfirmationService, PatientsService],
+  providers: [MessageService, ConfirmationService, MedicinesService],
 })
-export class PatientsComponent implements OnInit {
+export class MedicinesComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
-  patientForm: FormGroup = new FormGroup({});
-  isPatientFormVisible: boolean = false;
-  patients: IPatientResponseDTO[] = [];
-  selectedPatientId: number | undefined;
+  medicineForm: FormGroup = new FormGroup({});
+  isMedicineFormVisible: boolean = false;
+  medicines: IMedicineResponseDTO[] = [];
+  selectedMedicineId: number | undefined;
   isSubmitted: boolean = false;
   isSubmitLoading: boolean = false;
-  isPatientListLoading: boolean = false;
-  isPatientDetailLoading: boolean = false;
+  isMedicineListLoading: boolean = false;
+  isMedicineDetailLoading: boolean = false;
   isDeleteLoading: boolean = false;
 
   currentPage: number = 1;
@@ -62,11 +64,11 @@ export class PatientsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private patientsService: PatientsService
+    private medicinesService: MedicinesService
   ) {}
 
   ngOnInit(): void {
-    patientFields.forEach(field => {
+    medicineFields.forEach(field => {
       const formControl: FormControl = new FormControl('');
       if (field.isRequired) {
         formControl.addValidators(Validators.required);
@@ -74,52 +76,41 @@ export class PatientsComponent implements OnInit {
       if (field.regexPattern) {
         formControl.addValidators(Validators.pattern(field.regexPattern));
       }
-      this.patientForm.addControl(field.key, formControl);
+      this.medicineForm.addControl(field.key, formControl);
     });
 
     let queryParams = {};
     this.activatedRoute.queryParams.subscribe(params => {
       queryParams = params;
     });
-    this.onGetPatients(queryParams);
+    this.onGetMedicines(queryParams);
   }
 
-  onGetPatients(params?: { [key: string]: string | number }): void {
+  onGetMedicines(params?: { [key: string]: string | number }): void {
     const queryParams = params ?? { page: this.currentPage, per_page: this.perPage };
-    this.isPatientListLoading = true;
-    this.patientsService
+    this.isMedicineListLoading = true;
+    this.medicinesService
       .get(queryParams)
       .pipe(takeUntil(this.ngUnsubsribe))
       .subscribe({
         next: res => {
-          this.patients = res.data;
+          this.medicines = res.data;
           this.totalData = res.meta?.total_data as number;
         },
         error: error => {
           console.error(error);
-          this.isPatientListLoading = false;
+          this.isMedicineListLoading = false;
         },
       });
 
     // Hanya untuk testing
-    this.patients = [
+    this.medicines = [
       {
         id: 1,
-        username: 'Username',
-        first_name: 'Firstname',
-        last_name: 'Lastname',
-        id_card: 333327346287364,
-        age: 23,
-        gender: 'MALE',
-        address: 'Address Street',
-        city: 'Ghost City',
-        blood_type: 'B',
-        bod: new Date(),
-        phone_number: '087739999776',
-        postal_code: 24456,
-        register_date: new Date(),
-        register_by: 1,
-        updated_by: 1,
+        name: 'Obat 01',
+        description: 'Deskripsi Obat 01',
+        price: 10000,
+        stock: 9999,
         created_at: new Date(),
         updated_at: new Date(),
       },
@@ -133,35 +124,35 @@ export class PatientsComponent implements OnInit {
       page: pagination.page + 1,
       per_page: pagination.rows,
     };
-    this.router.navigate(['/dashboard/patients'], { queryParams, replaceUrl: true });
-    this.onGetPatients(queryParams);
+    this.router.navigate(['/dashboard/medicines'], { queryParams, replaceUrl: true });
+    this.onGetMedicines(queryParams);
   }
 
   onToggleForm(): void {
-    this.isPatientFormVisible = !this.isPatientFormVisible;
+    this.isMedicineFormVisible = !this.isMedicineFormVisible;
   }
 
   onHideForm(): void {
-    this.patientForm.reset();
+    this.medicineForm.reset();
     this.isSubmitted = false;
   }
 
   onAddPreview(): void {
     this.onToggleForm();
-    this.patientForm.reset();
+    this.medicineForm.reset();
   }
 
-  onEditPreview(patient: IPatientResponseDTO): void {
-    this.selectedPatientId = patient.id;
-    this.patientForm.patchValue(patient);
+  onEditPreview(medicine: IMedicineResponseDTO): void {
+    this.selectedMedicineId = medicine.id;
+    this.medicineForm.patchValue(medicine);
     this.onToggleForm();
   }
 
   onDeletePreview(id: number) {
-    this.selectedPatientId = id;
+    this.selectedMedicineId = id;
     this.confirmationService.confirm({
-      header: 'Delete Patient',
-      message: 'Do you want to delete this patient? Patient will deleted permanently, so be careful',
+      header: 'Delete Medicine',
+      message: 'Do you want to delete this medicine? Medicine will deleted permanently, so be careful',
       icon: 'pi pi-info-circle',
       defaultFocus: 'none',
       acceptIcon: '',
@@ -169,7 +160,7 @@ export class PatientsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-outlined p-button-danger p-button-sm',
       accept: () => {
         this.isDeleteLoading = true;
-        this.patientsService
+        this.medicinesService
           .delete(id)
           .pipe(takeUntil(this.ngUnsubsribe))
           .subscribe({
@@ -177,10 +168,10 @@ export class PatientsComponent implements OnInit {
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Patient Deleted!',
+                detail: 'Medicine Deleted!',
               });
-              this.selectedPatientId = undefined;
-              this.onGetPatients();
+              this.selectedMedicineId = undefined;
+              this.onGetMedicines();
             },
             complete: () => {
               this.isDeleteLoading = false;
@@ -190,30 +181,30 @@ export class PatientsComponent implements OnInit {
       rejectLabel: 'Cancel',
       rejectButtonStyleClass: 'p-button-primary p-button-sm',
       reject: () => {
-        this.selectedPatientId = undefined;
+        this.selectedMedicineId = undefined;
       },
     });
   }
 
   onSubmit() {
     this.isSubmitted = true;
-    if (this.patientForm.invalid) return;
+    if (this.medicineForm.invalid) return;
     this.isSubmitLoading = true;
-    const payload: IPatientRequestDTO = this.patientForm.value;
-    const submitService = this.selectedPatientId
-      ? this.patientsService.update(this.selectedPatientId, payload)
-      : this.patientsService.create(payload);
+    const payload: IMedicineRequestDTO = this.medicineForm.value;
+    const submitService = this.selectedMedicineId
+      ? this.medicinesService.update(this.selectedMedicineId, payload)
+      : this.medicinesService.create(payload);
     submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
       next: () => {
         this.isSubmitted = false;
         this.onToggleForm();
-        this.patientForm.reset();
+        this.medicineForm.reset();
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: this.selectedPatientId ? 'Patient Updated!' : 'Patient Created!',
+          detail: this.selectedMedicineId ? 'Medicine Updated!' : 'Medicine Created!',
         });
-        this.onGetPatients();
+        this.onGetMedicines();
       },
       error: error => {
         console.log(error);

@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { IPatientRequestDTO, IPatientResponseDTO } from '../dtos/IPatientDTO';
-import { IBaseResponseDTO } from 'src/app/core/dtos/IBaseResponseDTO';
 import { environment } from 'src/environments/environment';
+import { IBaseResponseDTO } from 'src/app/core/dtos/IBaseResponseDTO';
+import { IPatientRequestDTO, IPatientResponseDTO } from '../dtos/IPatientsDTO';
 
 @Injectable({
   providedIn: 'root',
