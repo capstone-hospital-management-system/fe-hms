@@ -24,9 +24,12 @@
     @apply p-0;
   }
 
-  .p-button-label {
-    @apply text-left pl-2;
+  .p-overlaypanel-content {
+    .p-button-label {
+      @apply text-left pl-2;
+    }
   }
+
 
   .p-dialog {
     .p-dialog-header {

@@ -48,7 +48,7 @@ export class SidebarComponent {
         page: 1,
         per_page: 5,
       },
-      icon: 'pi pi-tags',
+      icon: 'pi pi-book',
       title: 'Prescriptions',
     },
   ];

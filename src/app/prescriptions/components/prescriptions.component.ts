@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -15,10 +15,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CalendarModule } from 'primeng/calendar';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { DropdownModule } from 'primeng/dropdown';
 
 import { PrescriptionsService } from '../services/prescriptions.service';
 import { IPrescriptionRequestDTO, IPrescriptionResponseDTO } from '../dtos/IPrescriptionsDTO';
 import { prescriptionFields } from '../models/prescriptions';
+import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
 
 @Component({
   selector: 'app-prescriptions',
@@ -39,6 +42,8 @@ import { prescriptionFields } from '../models/prescriptions';
     InputNumberModule,
     InputTextareaModule,
     CalendarModule,
+    RadioButtonModule,
+    DropdownModule,
   ],
   providers: [MessageService, ConfirmationService, PrescriptionsService],
 })
@@ -47,6 +52,8 @@ export class PrescriptionsComponent implements OnInit {
   prescriptionForm: FormGroup = new FormGroup({});
   isPrescriptionFormVisible: boolean = false;
   prescriptions: IPrescriptionResponseDTO[] = [];
+  diagnoseList: any[] = [];
+  medicineList: IMedicineResponseDTO[] = [];
   selectedPrescriptionId: number | undefined;
   isSubmitted: boolean = false;
   isSubmitLoading: boolean = false;
@@ -69,14 +76,19 @@ export class PrescriptionsComponent implements OnInit {
 
   ngOnInit(): void {
     prescriptionFields.forEach(field => {
-      const formControl: FormControl = new FormControl('');
-      if (field.isRequired) {
-        formControl.addValidators(Validators.required);
+      if (field.key === 'medicines') {
+        const formArray = new FormArray([], Validators.required);
+        this.prescriptionForm.addControl(field.key, formArray);
+      } else {
+        const formControl = new FormControl('');
+        if (field.isRequired) {
+          formControl.addValidators(Validators.required);
+        }
+        if (field.regexPattern) {
+          formControl.addValidators(Validators.pattern(field.regexPattern));
+        }
+        this.prescriptionForm.addControl(field.key, formControl);
       }
-      if (field.regexPattern) {
-        formControl.addValidators(Validators.pattern(field.regexPattern));
-      }
-      this.prescriptionForm.addControl(field.key, formControl);
     });
 
     let queryParams = {};
@@ -109,12 +121,64 @@ export class PrescriptionsComponent implements OnInit {
         id: 1,
         diagnose_id: 1,
         description: 'Diskripsi Resep',
-        status: 'DONE',
+        status: 'NEW',
         others: '',
         created_at: new Date(),
         updated_at: new Date(),
       },
     ];
+    this.medicineList = [
+      {
+        id: 1,
+        name: 'Obat 01',
+        description: 'Deskripsi Obat 01',
+        price: 10000,
+        stock: 9999,
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        id: 2,
+        name: 'Obat 02',
+        description: 'Deskripsi Obat 02',
+        price: 10000,
+        stock: 9999,
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+      {
+        id: 3,
+        name: 'Obat 03',
+        description: 'Deskripsi Obat 03',
+        price: 10000,
+        stock: 9999,
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+    ];
+    this.diagnoseList = [
+      {
+        id: 1,
+        name: 'Obat 01',
+        description: 'Deskripsi Obat 01',
+        price: 10000,
+        stock: 9999,
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
+    ];
+  }
+
+  get medicines() {
+    return this.prescriptionForm.get('medicines') as FormArray;
+  }
+
+  onAddMedicines(): void {
+    this.medicines.push(new FormControl('', Validators.required));
+  }
+
+  onRemoveMedicines(index: number): void {
+    this.medicines.removeAt(index);
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
@@ -187,6 +251,10 @@ export class PrescriptionsComponent implements OnInit {
   }
 
   onSubmit() {
+    this.prescriptionForm.patchValue({ status: 'NEW' });
+    console.log(this.prescriptionForm.value);
+    console.log(this.prescriptionForm);
+
     this.isSubmitted = true;
     if (this.prescriptionForm.invalid) return;
     this.isSubmitLoading = true;
