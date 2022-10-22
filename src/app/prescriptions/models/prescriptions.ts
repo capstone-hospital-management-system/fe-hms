@@ -2,7 +2,7 @@ import { IField } from 'src/app/core/dtos/IFields';
 
 export const prescriptionFields: IField[] = [
   {
-    key: 'diagnose',
+    key: 'diagnose_id',
     label: 'Diagnose',
     placeholder: '',
     type: 'select',
@@ -10,7 +10,7 @@ export const prescriptionFields: IField[] = [
     regexPattern: '',
   },
   {
-    key: 'medicines',
+    key: 'medicine_ids',
     label: 'Medicines',
     placeholder: '',
     type: 'select',

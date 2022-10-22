@@ -47,6 +47,11 @@ import { DashboardLayoutComponent } from './core/layout/dashboard-layout/dashboa
               loadComponent: () =>
                 import('./prescriptions/components/prescriptions.component').then(m => m.PrescriptionsComponent),
             },
+            {
+              path: 'bills',
+              title: 'Bills',
+              loadComponent: () => import('./bills/components/bills.component').then(m => m.BillsComponent),
+            },
           ],
         },
         { path: 'error-page', component: ErrorPageComponent },

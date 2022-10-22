@@ -56,7 +56,7 @@
           {{ medicine.description }}
         </td>
         <td class="text-sm">
-          {{ medicine.price }}
+          {{ medicine.price | currency: 'IDR' }}
         </td>
         <td class="text-sm">
           {{ medicine.stock }}

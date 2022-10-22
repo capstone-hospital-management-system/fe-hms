@@ -1,0 +1,155 @@
+<p-toast></p-toast>
+<p-confirmDialog [baseZIndex]="3" styleClass="md:max-w-[30vw]"></p-confirmDialog>
+
+<div class="container p-5">
+  <div class="flex mb-5">
+    <div class="mr-4">
+      <button
+        pButton
+        label="New Bill"
+        icon="pi pi-plus"
+        class="p-button-success p-button-sm"
+        (click)="onAddPreview()"></button>
+    </div>
+    <div *ngIf="false" class="mr-auto">
+      <button pButton label="Bulk Delete" icon="pi pi-trash" class="p-button-danger p-button-sm"></button>
+    </div>
+  </div>
+
+  <p-table
+    #dt
+    dataKey="id"
+    responsiveLayout="scroll"
+    [value]="bills"
+    [rows]="perPage"
+    [rowHover]="!isBillListLoading"
+    [rowsPerPageOptions]="[5, 10, 25, 50, 100]">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="text-sm">ID</th>
+        <th class="text-sm">Prescription</th>
+        <th class="text-sm">Total Price</th>
+        <th class="text-sm">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-bill>
+      <tr *ngIf="isBillListLoading">
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+      </tr>
+
+      <tr *ngIf="!isBillListLoading">
+        <td class="text-sm">
+          {{ bill.id }}
+        </td>
+        <td class="text-sm">
+          {{ bill.prescription_id }}
+        </td>
+        <td class="text-sm">
+          {{ bill.total_price | currency: 'IDR' }}
+        </td>
+        <td>
+          <button
+            pButton
+            icon="pi pi-download"
+            class="p-button-primary p-button-sm mr-2"
+            [loading]="bill.id === selectedBillId && isBillDetailLoading"
+            (click)="onEditPreview(bill)"></button>
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-warning p-button-sm mr-2"
+            [loading]="bill.id === selectedBillId && isBillDetailLoading"
+            (click)="onEditPreview(bill)"></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-danger p-button-sm"
+            [disabled]="isDeleteLoading"
+            [loading]="bill.id === selectedBillId && isDeleteLoading"
+            (click)="onDeletePreview(bill.id)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-paginator
+    class="custom-pagination"
+    styleClass="mt-4"
+    [rows]="perPage"
+    [totalRecords]="totalData"
+    [rowsPerPageOptions]="[5, 10, 25, 50, 100]"
+    (onPageChange)="onChangePage($event)"></p-paginator>
+
+  <p-dialog
+    [header]="selectedBillId ? 'Edit Bill' : 'New Bill'"
+    position="top"
+    responsiveLayout="scroll"
+    [(visible)]="isBillFormVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="!isSubmitLoading"
+    [style]="{ width: '100%', 'max-width': '30vw' }"
+    (onHide)="onHideForm()">
+    <form [formGroup]="billForm" style="padding-top: 1px" (ngSubmit)="onSubmit()">
+      <div class="grid gap-4">
+        <div class="field">
+          <p class="text-sm mb-2">Prescription</p>
+          <p-dropdown
+            formControlName="prescription_id"
+            inputId="prescription_id"
+            optionLabel="description"
+            optionValue="id"
+            filterBy="description"
+            placeholder="Select Prescription"
+            styleClass="p-dropdown-sm w-full"
+            [filter]="true"
+            [options]="prescriptionList"
+            [showClear]="true"
+            [ngClass]="{
+              'ng-invalid ng-dirty': isSubmitted && billForm.controls['prescription_id'].errors
+            }">
+            <ng-template let-prescription pTemplate="item">
+              <div>{{ prescription.description }}</div>
+            </ng-template>
+          </p-dropdown>
+          <small *ngIf="isSubmitted && billForm.controls['prescription_id'].errors" class="p-error block mt-1">
+            Prescription is required!
+          </small>
+        </div>
+        <div class="field">
+          <p class="text-sm mb-2">Total Price</p>
+          <p-inputNumber
+            formControlName="total_price"
+            inputId="total_price"
+            mode="currency"
+            currency="IDR"
+            locale="id-ID"
+            placeholder="Total Price"
+            inputStyleClass="p-inputtext-sm"
+            styleClass="w-full"
+            class="w-full"
+            [ngClass]="{
+              'ng-invalid ng-dirty': isSubmitted && billForm.controls['total_price'].errors
+            }"></p-inputNumber>
+          <small *ngIf="isSubmitted && billForm.controls['total_price'].errors" class="p-error block mt-1">
+            Total Price is required!
+          </small>
+        </div>
+      </div>
+
+      <div class="text-end mt-7">
+        <button
+          pButton
+          label="Save"
+          type="submit"
+          class="p-button-primary p-button-sm py-2 px-10"
+          [loading]="isSubmitLoading"></button>
+      </div>
+    </form>
+  </p-dialog>
+</div>

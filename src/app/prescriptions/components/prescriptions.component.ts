@@ -76,7 +76,7 @@ export class PrescriptionsComponent implements OnInit {
 
   ngOnInit(): void {
     prescriptionFields.forEach(field => {
-      if (field.key === 'medicines') {
+      if (field.key === 'medicine_ids') {
         const formArray = new FormArray([], Validators.required);
         this.prescriptionForm.addControl(field.key, formArray);
       } else {
@@ -169,16 +169,16 @@ export class PrescriptionsComponent implements OnInit {
     ];
   }
 
-  get medicines() {
-    return this.prescriptionForm.get('medicines') as FormArray;
+  get medicineIds() {
+    return this.prescriptionForm.get('medicine_ids') as FormArray;
   }
 
-  onAddMedicines(): void {
-    this.medicines.push(new FormControl('', Validators.required));
+  onAddMedicine(): void {
+    this.medicineIds.push(new FormControl('', Validators.required));
   }
 
-  onRemoveMedicines(index: number): void {
-    this.medicines.removeAt(index);
+  onRemoveMedicine(index: number): void {
+    this.medicineIds.removeAt(index);
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {

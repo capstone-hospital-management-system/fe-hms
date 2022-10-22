@@ -119,9 +119,10 @@
           <div class="field">
             <p class="text-sm mb-2">Diagnose</p>
             <p-dropdown
-              formControlName="diagnose"
-              id="diagnose"
+              formControlName="diagnose_id"
+              inputId="diagnose_id"
               optionLabel="name"
+              optionValue="id"
               filterBy="name"
               placeholder="Select Diagnose"
               styleClass="p-dropdown-sm w-full"
@@ -129,25 +130,16 @@
               [options]="diagnoseList"
               [showClear]="true"
               [ngClass]="{
-                'ng-invalid ng-dirty': isSubmitted && prescriptionForm.controls['diagnose'].errors
-              }">
-              <ng-template pTemplate="selectedItem">
-                <div *ngIf="prescriptionForm.value.diagnose">
-                  {{ prescriptionForm.value.diagnose.name }}
-                </div>
-              </ng-template>
-              <ng-template let-diagnose pTemplate="item">
-                <div>{{ diagnose.name }}</div>
-              </ng-template>
-            </p-dropdown>
-            <small *ngIf="isSubmitted && prescriptionForm.controls['diagnose'].errors" class="p-error block mt-1">
+                'ng-invalid ng-dirty': isSubmitted && prescriptionForm.controls['diagnose_id'].errors
+              }"></p-dropdown>
+            <small *ngIf="isSubmitted && prescriptionForm.controls['diagnose_id'].errors" class="p-error block mt-1">
               Diagnose is required!
             </small>
           </div>
           <div *ngIf="selectedPrescriptionId" class="field">
             <p class="text-sm mb-2">Status</p>
             <div class="flex flex-wrap align-middle">
-              <div class="flex items-center mr-2">
+              <div class="flex items-center mr-2 mb-2">
                 <p-radioButton
                   formControlName="status"
                   id="status1"
@@ -158,7 +150,7 @@
                   NEW
                 </label>
               </div>
-              <div class="flex items-center mr-2">
+              <div class="flex items-center mr-2 mb-2">
                 <p-radioButton
                   formControlName="status"
                   id="status2"
@@ -169,7 +161,7 @@
                   WAITING_PAYMENT
                 </label>
               </div>
-              <div class="flex items-center">
+              <div class="flex items-center mb-2">
                 <p-radioButton
                   formControlName="status"
                   id="status3"
@@ -222,15 +214,16 @@
             </small>
           </div>
         </div>
-        <div formArrayName="medicines" class="field">
+        <div formArrayName="medicine_ids" class="field">
           <p class="text-sm">Medicines</p>
           <div
-            *ngFor="let medicineField of medicines.controls; let medicineFieldIndex = index"
+            *ngFor="let medicineField of medicineIds.controls; let medicineFieldIndex = index"
             class="flex align-middle mt-2">
             <p-dropdown
               [formControlName]="medicineFieldIndex"
-              [id]="'medicine-' + medicineFieldIndex"
+              [inputId]="'medicine-' + medicineFieldIndex"
               optionLabel="name"
+              optionValue="id"
               filterBy="name"
               placeholder="Select Medicine"
               class="grow mr-3"
@@ -238,29 +231,21 @@
               [filter]="true"
               [options]="medicineList"
               [showClear]="true">
-              <ng-template pTemplate="selectedItem">
-                <div *ngIf="medicineField">
-                  {{ medicineField.value.name }}
-                </div>
-              </ng-template>
-              <ng-template let-medicine pTemplate="item">
-                <div>{{ medicine.name }}</div>
-              </ng-template>
             </p-dropdown>
             <button
               pButton
               icon="pi pi-trash"
               type="button"
               class="p-button-danger p-button-sm"
-              (click)="onRemoveMedicines(medicineFieldIndex)"></button>
+              (click)="onRemoveMedicine(medicineFieldIndex)"></button>
           </div>
           <button
             pButton
             label="Add Medicine"
             type="button"
             class="p-button-success p-button-sm w-full py-2 px-10 mt-3"
-            (click)="onAddMedicines()"></button>
-          <small *ngIf="isSubmitted && prescriptionForm.controls['medicines'].errors" class="p-error block mt-2">
+            (click)="onAddMedicine()"></button>
+          <small *ngIf="isSubmitted && prescriptionForm.controls['medicine_ids'].errors" class="p-error block mt-2">
             Medicines is required!
           </small>
         </div>
