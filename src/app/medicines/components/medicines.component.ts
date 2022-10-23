@@ -87,7 +87,10 @@ export class MedicinesComponent implements OnInit {
   }
 
   onGetMedicines(params?: { [key: string]: string | number }): void {
-    const queryParams = params ?? { page: this.currentPage, per_page: this.perPage };
+    const queryParams = {
+      page: params ? params['page'] : this.currentPage,
+      size: params ? params['per_page'] : this.perPage,
+    };
     this.isMedicineListLoading = true;
     this.medicinesService
       .get(queryParams)
@@ -104,17 +107,17 @@ export class MedicinesComponent implements OnInit {
       });
 
     // Hanya untuk testing
-    this.medicines = [
-      {
-        id: 1,
-        name: 'Obat 01',
-        description: 'Deskripsi Obat 01',
-        price: 10000,
-        stock: 9999,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ];
+    // this.medicines = [
+    //   {
+    //     id: 1,
+    //     name: 'Obat 01',
+    //     description: 'Deskripsi Obat 01',
+    //     price: 10000,
+    //     stock: 9999,
+    //     created_at: new Date(),
+    //     updated_at: new Date(),
+    //   },
+    // ];
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
