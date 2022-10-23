@@ -66,6 +66,7 @@
             pButton
             icon="pi pi-pencil"
             class="p-button-warning p-button-sm mr-2"
+            [disabled]="isDeleteLoading"
             [loading]="medicine.id === selectedMedicineId && isMedicineDetailLoading"
             (click)="onEditPreview(medicine)"></button>
           <button

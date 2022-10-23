@@ -99,7 +99,10 @@ export class PrescriptionsComponent implements OnInit {
   }
 
   onGetPrescriptions(params?: { [key: string]: string | number }): void {
-    const queryParams = params ?? { page: this.currentPage, per_page: this.perPage };
+    const queryParams = {
+      page: params ? params['page'] : this.currentPage,
+      size: params ? params['per_page'] : this.perPage,
+    };
     this.isPrescriptionListLoading = true;
     this.prescriptionsService
       .get(queryParams)
@@ -108,6 +111,7 @@ export class PrescriptionsComponent implements OnInit {
         next: res => {
           this.prescriptions = res.data;
           this.totalData = res.meta?.total_data as number;
+          this.isPrescriptionListLoading = false;
         },
         error: error => {
           console.error(error);
@@ -184,7 +188,7 @@ export class PrescriptionsComponent implements OnInit {
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
     this.currentPage = pagination.page + 1;
     this.perPage = pagination.rows;
-    let queryParams: { page: number; per_page: number; sort?: string } = {
+    let queryParams: { page: number; per_page: number } = {
       page: pagination.page + 1,
       per_page: pagination.rows,
     };
@@ -252,9 +256,6 @@ export class PrescriptionsComponent implements OnInit {
 
   onSubmit() {
     this.prescriptionForm.patchValue({ status: 'NEW' });
-    console.log(this.prescriptionForm.value);
-    console.log(this.prescriptionForm);
-
     this.isSubmitted = true;
     if (this.prescriptionForm.invalid) return;
     this.isSubmitLoading = true;
@@ -265,8 +266,9 @@ export class PrescriptionsComponent implements OnInit {
     submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
       next: () => {
         this.isSubmitted = false;
-        this.onToggleForm();
+        this.isSubmitLoading = false;
         this.prescriptionForm.reset();
+        this.onToggleForm();
         this.messageService.add({
           severity: 'success',
           summary: 'Success',

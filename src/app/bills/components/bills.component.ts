@@ -93,7 +93,10 @@ export class BillsComponent implements OnInit {
   }
 
   onGetBills(params?: { [key: string]: string | number }): void {
-    const queryParams = params ?? { page: this.currentPage, per_page: this.perPage };
+    const queryParams = {
+      page: params ? params['page'] : this.currentPage,
+      size: params ? params['per_page'] : this.perPage,
+    };
     this.isBillListLoading = true;
     this.billsService
       .get(queryParams)
@@ -102,6 +105,7 @@ export class BillsComponent implements OnInit {
         next: res => {
           this.bills = res.data;
           this.totalData = res.meta?.total_data as number;
+          this.isBillListLoading = false;
         },
         error: error => {
           console.error(error);
@@ -135,7 +139,7 @@ export class BillsComponent implements OnInit {
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
     this.currentPage = pagination.page + 1;
     this.perPage = pagination.rows;
-    let queryParams: { page: number; per_page: number; sort?: string } = {
+    let queryParams: { page: number; per_page: number } = {
       page: pagination.page + 1,
       per_page: pagination.rows,
     };
@@ -202,9 +206,6 @@ export class BillsComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.billForm.value);
-    console.log(this.billForm);
-
     this.isSubmitted = true;
     if (this.billForm.invalid) return;
     this.isSubmitLoading = true;
@@ -215,8 +216,9 @@ export class BillsComponent implements OnInit {
     submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
       next: () => {
         this.isSubmitted = false;
-        this.onToggleForm();
+        this.isSubmitLoading = false;
         this.billForm.reset();
+        this.onToggleForm();
         this.messageService.add({
           severity: 'success',
           summary: 'Success',

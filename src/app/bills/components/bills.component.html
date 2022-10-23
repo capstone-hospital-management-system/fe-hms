@@ -62,6 +62,7 @@
             pButton
             icon="pi pi-pencil"
             class="p-button-warning p-button-sm mr-2"
+            [disabled]="isDeleteLoading"
             [loading]="bill.id === selectedBillId && isBillDetailLoading"
             (click)="onEditPreview(bill)"></button>
           <button

@@ -99,31 +99,19 @@ export class MedicinesComponent implements OnInit {
         next: res => {
           this.medicines = res.data;
           this.totalData = res.meta?.total_data as number;
+          this.isMedicineListLoading = false;
         },
         error: error => {
           console.error(error);
           this.isMedicineListLoading = false;
         },
       });
-
-    // Hanya untuk testing
-    // this.medicines = [
-    //   {
-    //     id: 1,
-    //     name: 'Obat 01',
-    //     description: 'Deskripsi Obat 01',
-    //     price: 10000,
-    //     stock: 9999,
-    //     created_at: new Date(),
-    //     updated_at: new Date(),
-    //   },
-    // ];
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
     this.currentPage = pagination.page + 1;
     this.perPage = pagination.rows;
-    let queryParams: { page: number; per_page: number; sort?: string } = {
+    let queryParams: { page: number; per_page: number } = {
       page: pagination.page + 1,
       per_page: pagination.rows,
     };
@@ -200,8 +188,9 @@ export class MedicinesComponent implements OnInit {
     submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
       next: () => {
         this.isSubmitted = false;
-        this.onToggleForm();
+        this.isSubmitLoading = false;
         this.medicineForm.reset();
+        this.onToggleForm();
         this.messageService.add({
           severity: 'success',
           summary: 'Success',

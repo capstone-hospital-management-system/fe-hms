@@ -80,6 +80,7 @@
             pButton
             icon="pi pi-pencil"
             class="p-button-warning p-button-sm mr-2"
+            [disabled]="isDeleteLoading"
             [loading]="prescription.id === selectedPrescriptionId && isPrescriptionDetailLoading"
             (click)="onEditPreview(prescription)"></button>
           <button
