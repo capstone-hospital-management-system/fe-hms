@@ -234,6 +234,7 @@
           id="gender"
           type="select"
           placeholder="Gender"
+          styleClass="p-dropdown-sm w-full"
           [ngClass]="{
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['gender'].errors
           }"
@@ -251,6 +252,7 @@
           id="blood_type"
           type="select"
           placeholder="Blood Type"
+          styleClass="p-dropdown-sm w-full"
           [ngClass]="{
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['blood_type'].errors
           }"
@@ -268,6 +270,7 @@
         <p-calendar
           formControlName="bod"
           dateFormat="yy-mm-dd"
+          appendTo="body"
           placeholder="Date of Birth"
           [ngClass]="{
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['bod'].errors
