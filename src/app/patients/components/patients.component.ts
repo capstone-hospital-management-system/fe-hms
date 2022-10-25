@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
@@ -18,6 +18,9 @@ import { CalendarModule } from 'primeng/calendar';
 import { IPatientRequestDTO, IPatientResponseDTO } from '../dtos/IPatientsDTO';
 import { PatientsService } from '../services/patients.service';
 import { patientFields } from '../models/patients';
+import { BloodTypes } from '../models/blood-types';
+import { Genders } from '../models/genders';
+
 
 @Component({
   selector: 'app-patients',
@@ -51,6 +54,9 @@ export class PatientsComponent implements OnInit {
   isPatientListLoading: boolean = false;
   isPatientDetailLoading: boolean = false;
   isDeleteLoading: boolean = false;
+  bloodTypes: BloodTypes[] = [];
+  genders: Genders[] = [];
+
 
   currentPage: number = 1;
   perPage: number = 5;
@@ -63,7 +69,8 @@ export class PatientsComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private patientsService: PatientsService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     patientFields.forEach(field => {
@@ -82,10 +89,15 @@ export class PatientsComponent implements OnInit {
       queryParams = params;
     });
     this.onGetPatients(queryParams);
+    this.bloodTypes = Object.values(BloodTypes);
+    this.genders = Object.values(Genders);
   }
 
   onGetPatients(params?: { [key: string]: string | number }): void {
-    const queryParams = params ?? { page: this.currentPage, per_page: this.perPage };
+    const queryParams = {
+      page: params ? params['page'] : this.currentPage,
+      size: params ? params['per_page'] : this.perPage,
+    };
     this.isPatientListLoading = true;
     this.patientsService
       .get(queryParams)
@@ -94,36 +106,13 @@ export class PatientsComponent implements OnInit {
         next: res => {
           this.patients = res.data;
           this.totalData = res.meta?.total_data as number;
+          this.isPatientListLoading = false;
         },
         error: error => {
           console.error(error);
           this.isPatientListLoading = false;
         },
       });
-
-    // Hanya untuk testing
-    this.patients = [
-      {
-        id: 1,
-        username: 'Username',
-        first_name: 'Firstname',
-        last_name: 'Lastname',
-        id_card: 333327346287364,
-        age: 23,
-        gender: 'MALE',
-        address: 'Address Street',
-        city: 'Ghost City',
-        blood_type: 'B',
-        bod: new Date(),
-        phone_number: '087739999776',
-        postal_code: 24456,
-        register_date: new Date(),
-        register_by: 1,
-        updated_by: 1,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ];
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
@@ -200,12 +189,15 @@ export class PatientsComponent implements OnInit {
     if (this.patientForm.invalid) return;
     this.isSubmitLoading = true;
     const payload: IPatientRequestDTO = this.patientForm.value;
+    const dateOfBirth = new Date(payload.bod);
+    payload.bod = formatDate(dateOfBirth, 'yyyy-MM-dd HH:mm:dd', 'en-US');
     const submitService = this.selectedPatientId
       ? this.patientsService.update(this.selectedPatientId, payload)
       : this.patientsService.create(payload);
     submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
       next: () => {
         this.isSubmitted = false;
+        this.isSubmitLoading = false;
         this.onToggleForm();
         this.patientForm.reset();
         this.messageService.add({

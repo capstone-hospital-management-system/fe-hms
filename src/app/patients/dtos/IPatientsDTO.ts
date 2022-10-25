@@ -2,7 +2,7 @@ export interface IPatient {
   username: string;
   first_name: string;
   last_name: string;
-  id_card: number;
+  id_card: string;
   age: number;
   gender: string;
   address: string;
@@ -11,9 +11,9 @@ export interface IPatient {
   bod: string | Date;
   phone_number: string;
   postal_code: number;
-  register_date: string | Date;
-  register_by: number;
-  updated_by: number;
+  //register_date: string | Date;
+  register_by: any;
+  updated_by: any;
 }
 
 export interface IPatientResponseDTO extends IPatient {

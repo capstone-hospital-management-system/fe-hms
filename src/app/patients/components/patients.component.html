@@ -228,16 +228,16 @@
 
       <div class="field">
         <p class="text-sm mb-2">Gender</p>
-        <input
+        <p-dropdown
+          [options]="genders"
           formControlName="gender"
           id="gender"
-          type="text"
-          pInputText
+          type="select"
           placeholder="Gender"
           [ngClass]="{
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['gender'].errors
           }"
-          class="p-inputtext-sm w-full" />
+          class="w-full"></p-dropdown>
         <small *ngIf="isSubmitted && patientForm.controls['gender'].errors" id="gender" class="p-error block mt-1">
           Gender is required!
         </small>
@@ -245,16 +245,16 @@
 
       <div class="field">
         <p class="text-sm mb-2">Blood Type</p>
-        <input
+        <p-dropdown
+          [options]="bloodTypes"
           formControlName="blood_type"
           id="blood_type"
-          type="text"
-          pInputText
+          type="select"
           placeholder="Blood Type"
           [ngClass]="{
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['blood_type'].errors
           }"
-          class="p-inputtext-sm w-full" />
+          class="w-full"></p-dropdown>
         <small
           *ngIf="isSubmitted && patientForm.controls['blood_type'].errors"
           id="blood_type"
@@ -267,7 +267,7 @@
         <p class="text-sm mb-2">Date of Birth</p>
         <p-calendar
           formControlName="bod"
-          dateFormat="dd-mm-yy"
+          dateFormat="yy-mm-dd"
           placeholder="Date of Birth"
           [ngClass]="{
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['bod'].errors
