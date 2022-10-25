@@ -21,7 +21,6 @@ import { patientFields } from '../models/patients';
 import { BloodTypes } from '../models/blood-types';
 import { Genders } from '../models/genders';
 
-
 @Component({
   selector: 'app-patients',
   templateUrl: './patients.component.html',
@@ -57,7 +56,6 @@ export class PatientsComponent implements OnInit {
   bloodTypes: BloodTypes[] = [];
   genders: Genders[] = [];
 
-
   currentPage: number = 1;
   perPage: number = 5;
   totalPage: number = 1;
@@ -69,8 +67,7 @@ export class PatientsComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private patientsService: PatientsService
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     patientFields.forEach(field => {
@@ -143,6 +140,9 @@ export class PatientsComponent implements OnInit {
   onEditPreview(patient: IPatientResponseDTO): void {
     this.selectedPatientId = patient.id;
     this.patientForm.patchValue(patient);
+    this.patientForm.patchValue({
+      bod: new Date(patient.bod),
+    });
     this.onToggleForm();
   }
 
