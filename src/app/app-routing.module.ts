@@ -17,8 +17,19 @@ import { DashboardLayoutComponent } from './core/layout/dashboard-layout/dashboa
         },
         {
           path: 'auth',
+          redirectTo: 'auth/login',
+          pathMatch: 'full',
+        },
+        {
+          path: 'auth',
           component: AuthLayoutComponent,
-          loadChildren: () => import('./auth/auth-routing.module').then(m => m.AuthRoutingModule),
+          children: [
+            {
+              path: 'login',
+              title: 'Login',
+              loadComponent: () => import('./auth/pages/login/login.component').then(m => m.LoginComponent),
+            },
+          ],
         },
         {
           path: 'dashboard',

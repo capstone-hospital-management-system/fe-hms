@@ -22,6 +22,6 @@ export class AuthGuard implements CanActivate, CanLoad {
   }
 
   isLogin(): boolean {
-    return this.sessionService.isAdminLogin();
+    return this.sessionService.isLogin();
   }
 }

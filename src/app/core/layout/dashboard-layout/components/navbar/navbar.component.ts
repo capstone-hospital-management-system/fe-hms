@@ -100,8 +100,8 @@ export class NavbarComponent implements OnInit, DoCheck {
     if (!currentSession) return { initialName: 'U', name: 'unknown user' };
 
     const credentialData = {
-      initialName: currentSession.name.charAt(0).toUpperCase(),
-      name: currentSession.name,
+      initialName: currentSession.username.charAt(0).toUpperCase(),
+      name: currentSession.username,
     };
     return credentialData;
   }

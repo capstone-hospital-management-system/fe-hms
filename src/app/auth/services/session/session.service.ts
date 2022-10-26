@@ -1,7 +1,7 @@
 import { Observable, of } from 'rxjs';
 import { Injectable } from '@angular/core';
 
-import { IAdminInfo } from 'src/app/auth/dtos/IAuth';
+import { IAccountResponseDTO } from 'src/app/auth/dtos/IAuth';
 
 @Injectable({
   providedIn: 'root',
@@ -9,21 +9,21 @@ import { IAdminInfo } from 'src/app/auth/dtos/IAuth';
 export class SessionService {
   constructor() {}
 
-  createSession(adminInfo: IAdminInfo): void {
-    localStorage.setItem('admin_info', JSON.stringify(adminInfo));
+  createSession(account: IAccountResponseDTO): void {
+    localStorage.setItem('account_info', JSON.stringify(account));
   }
 
-  getSession(): IAdminInfo {
-    return JSON.parse(localStorage.getItem('admin_info') as string);
+  getSession(): IAccountResponseDTO {
+    return JSON.parse(localStorage.getItem('account_info') as string);
   }
 
-  getToken(): any {
+  getAccessToken(): any {
     return localStorage.getItem('access_token');
   }
 
-  isAdminLogin(): boolean {
-    const authToken = localStorage.getItem('access_token');
-    return authToken ? true : false;
+  isLogin(): boolean {
+    const accessToken = localStorage.getItem('access_token');
+    return accessToken ? true : false;
   }
 
   getEmail(): Observable<string> {

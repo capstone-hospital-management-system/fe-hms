@@ -9,8 +9,8 @@ export class HttpSessionInterceptor implements HttpInterceptor {
   constructor(private sessionService: SessionService) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    if (this.sessionService.getSession() || this.sessionService.getToken()) {
-      let headers = request.headers.set('Authorization', `Bearer ${this.sessionService.getToken()}`);
+    if (this.sessionService.getSession() || this.sessionService.getAccessToken()) {
+      let headers = request.headers.set('Authorization', `Bearer ${this.sessionService.getAccessToken()}`);
 
       request = request.clone({
         headers: headers,
