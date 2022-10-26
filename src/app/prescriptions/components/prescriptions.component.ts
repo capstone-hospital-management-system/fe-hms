@@ -118,59 +118,6 @@ export class PrescriptionsComponent implements OnInit {
           this.isPrescriptionListLoading = false;
         },
       });
-
-    // Hanya untuk testing
-    this.prescriptions = [
-      {
-        id: 1,
-        diagnose_id: 1,
-        description: 'Diskripsi Resep',
-        status: 'NEW',
-        others: '',
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ];
-    this.medicineList = [
-      {
-        id: 1,
-        name: 'Obat 01',
-        description: 'Deskripsi Obat 01',
-        price: 10000,
-        stock: 9999,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-      {
-        id: 2,
-        name: 'Obat 02',
-        description: 'Deskripsi Obat 02',
-        price: 10000,
-        stock: 9999,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-      {
-        id: 3,
-        name: 'Obat 03',
-        description: 'Deskripsi Obat 03',
-        price: 10000,
-        stock: 9999,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ];
-    this.diagnoseList = [
-      {
-        id: 1,
-        name: 'Obat 01',
-        description: 'Deskripsi Obat 01',
-        price: 10000,
-        stock: 9999,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ];
   }
 
   get medicineIds() {
@@ -206,6 +153,7 @@ export class PrescriptionsComponent implements OnInit {
   }
 
   onAddPreview(): void {
+    this.selectedPrescriptionId = undefined;
     this.onToggleForm();
     this.prescriptionForm.reset();
   }

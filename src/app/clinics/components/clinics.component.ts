@@ -15,18 +15,15 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CalendarModule } from 'primeng/calendar';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { DropdownModule } from 'primeng/dropdown';
 
-import { BillsService } from '../services/bills.service';
-import { IBillRequestDTO, IBillResponseDTO } from '../dtos/IBillsDTO';
-import { billFields } from '../models/bills';
-import { IPrescriptionResponseDTO } from 'src/app/prescriptions/dtos/IPrescriptionsDTO';
+import { ClinicsService } from '../services/clinics.service';
+import { IClinicRequestDTO, IClinicResponseDTO } from '../dtos/IClinicsDTO';
+import { clinicFields } from '../models/clinics';
 
 @Component({
-  selector: 'app-bills',
-  templateUrl: './bills.component.html',
-  styleUrls: ['./bills.component.scss'],
+  selector: 'app-clinics',
+  templateUrl: './clinics.component.html',
+  styleUrls: ['./clinics.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -42,22 +39,19 @@ import { IPrescriptionResponseDTO } from 'src/app/prescriptions/dtos/IPrescripti
     InputNumberModule,
     InputTextareaModule,
     CalendarModule,
-    RadioButtonModule,
-    DropdownModule,
   ],
-  providers: [MessageService, ConfirmationService, BillsService],
+  providers: [MessageService, ConfirmationService, ClinicsService],
 })
-export class BillsComponent implements OnInit {
+export class ClinicsComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
-  billForm: FormGroup = new FormGroup({});
-  isBillFormVisible: boolean = false;
-  bills: IBillResponseDTO[] = [];
-  prescriptionList: IPrescriptionResponseDTO[] = [];
-  selectedBillId: number | undefined;
+  clinicForm: FormGroup = new FormGroup({});
+  isClinicFormVisible: boolean = false;
+  clinics: IClinicResponseDTO[] = [];
+  selectedClinicId: number | undefined;
   isSubmitted: boolean = false;
   isSubmitLoading: boolean = false;
-  isBillListLoading: boolean = false;
-  isBillDetailLoading: boolean = false;
+  isClinicListLoading: boolean = false;
+  isClinicDetailLoading: boolean = false;
   isDeleteLoading: boolean = false;
 
   currentPage: number = 1;
@@ -70,70 +64,48 @@ export class BillsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private billsService: BillsService
+    private clinicsService: ClinicsService
   ) {}
 
   ngOnInit(): void {
-    billFields.forEach(field => {
-      const formControl = new FormControl('');
+    clinicFields.forEach(field => {
+      const formControl: FormControl = new FormControl('');
       if (field.isRequired) {
         formControl.addValidators(Validators.required);
       }
       if (field.regexPattern) {
         formControl.addValidators(Validators.pattern(field.regexPattern));
       }
-      this.billForm.addControl(field.key, formControl);
+      this.clinicForm.addControl(field.key, formControl);
     });
 
     let queryParams = {};
     this.activatedRoute.queryParams.subscribe(params => {
       queryParams = params;
     });
-    this.onGetBills(queryParams);
+    this.onGetClinics(queryParams);
   }
 
-  onGetBills(params?: { [key: string]: string | number }): void {
+  onGetClinics(params?: { [key: string]: string | number }): void {
     const queryParams = {
       page: params ? params['page'] : this.currentPage,
       size: params ? params['per_page'] : this.perPage,
     };
-    this.isBillListLoading = true;
-    this.billsService
+    this.isClinicListLoading = true;
+    this.clinicsService
       .get(queryParams)
       .pipe(takeUntil(this.ngUnsubsribe))
       .subscribe({
         next: res => {
-          this.bills = res.data;
+          this.clinics = res.data;
           this.totalData = res.meta?.total_data as number;
-          this.isBillListLoading = false;
+          this.isClinicListLoading = false;
         },
         error: error => {
           console.error(error);
-          this.isBillListLoading = false;
+          this.isClinicListLoading = false;
         },
       });
-
-    // Hanya untuk testing
-    this.bills = [
-      {
-        id: 1,
-        prescription_id: 1,
-        total_price: 250000,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ];
-    this.prescriptionList = [
-      {
-        id: 1,
-        diagnose_id: 1,
-        description: 'Deskripsi Prescription',
-        others: '',
-        status: 'WAITING_PAYMENT',
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ];
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
@@ -143,36 +115,36 @@ export class BillsComponent implements OnInit {
       page: pagination.page + 1,
       per_page: pagination.rows,
     };
-    this.router.navigate(['/dashboard/bills'], { queryParams, replaceUrl: true });
-    this.onGetBills(queryParams);
+    this.router.navigate(['/dashboard/clinics'], { queryParams, replaceUrl: true });
+    this.onGetClinics(queryParams);
   }
 
   onToggleForm(): void {
-    this.isBillFormVisible = !this.isBillFormVisible;
+    this.isClinicFormVisible = !this.isClinicFormVisible;
   }
 
   onHideForm(): void {
-    this.billForm.reset();
+    this.clinicForm.reset();
     this.isSubmitted = false;
   }
 
   onAddPreview(): void {
-    this.selectedBillId = undefined;
+    this.selectedClinicId = undefined;
     this.onToggleForm();
-    this.billForm.reset();
+    this.clinicForm.reset();
   }
 
-  onEditPreview(bill: IBillResponseDTO): void {
-    this.selectedBillId = bill.id;
-    this.billForm.patchValue(bill);
+  onEditPreview(clinic: IClinicResponseDTO): void {
+    this.selectedClinicId = clinic.id;
+    this.clinicForm.patchValue(clinic);
     this.onToggleForm();
   }
 
   onDeletePreview(id: number) {
-    this.selectedBillId = id;
+    this.selectedClinicId = id;
     this.confirmationService.confirm({
-      header: 'Delete Bill',
-      message: 'Do you want to delete this bill? Bill will deleted permanently, so be careful',
+      header: 'Delete Clinic',
+      message: 'Do you want to delete this clinic? Clinic will deleted permanently, so be careful',
       icon: 'pi pi-info-circle',
       defaultFocus: 'none',
       acceptIcon: '',
@@ -180,7 +152,7 @@ export class BillsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-outlined p-button-danger p-button-sm',
       accept: () => {
         this.isDeleteLoading = true;
-        this.billsService
+        this.clinicsService
           .delete(id)
           .pipe(takeUntil(this.ngUnsubsribe))
           .subscribe({
@@ -188,10 +160,10 @@ export class BillsComponent implements OnInit {
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Bill Deleted!',
+                detail: 'Clinic Deleted!',
               });
-              this.selectedBillId = undefined;
-              this.onGetBills();
+              this.selectedClinicId = undefined;
+              this.onGetClinics();
             },
             complete: () => {
               this.isDeleteLoading = false;
@@ -201,31 +173,31 @@ export class BillsComponent implements OnInit {
       rejectLabel: 'Cancel',
       rejectButtonStyleClass: 'p-button-primary p-button-sm',
       reject: () => {
-        this.selectedBillId = undefined;
+        this.selectedClinicId = undefined;
       },
     });
   }
 
   onSubmit() {
     this.isSubmitted = true;
-    if (this.billForm.invalid) return;
+    if (this.clinicForm.invalid) return;
     this.isSubmitLoading = true;
-    const payload: IBillRequestDTO = this.billForm.value;
-    const submitService = this.selectedBillId
-      ? this.billsService.update(this.selectedBillId, payload)
-      : this.billsService.create(payload);
+    const payload: IClinicRequestDTO = this.clinicForm.value;
+    const submitService = this.selectedClinicId
+      ? this.clinicsService.update(this.selectedClinicId, payload)
+      : this.clinicsService.create(payload);
     submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
       next: () => {
         this.isSubmitted = false;
         this.isSubmitLoading = false;
-        this.billForm.reset();
+        this.clinicForm.reset();
         this.onToggleForm();
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: this.selectedBillId ? 'Bill Updated!' : 'Bill Created!',
+          detail: this.selectedClinicId ? 'Clinic Updated!' : 'Clinic Created!',
         });
-        this.onGetBills();
+        this.onGetClinics();
       },
       error: error => {
         console.error(error);

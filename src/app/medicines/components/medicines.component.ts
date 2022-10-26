@@ -129,6 +129,7 @@ export class MedicinesComponent implements OnInit {
   }
 
   onAddPreview(): void {
+    this.selectedMedicineId = undefined;
     this.onToggleForm();
     this.medicineForm.reset();
   }

@@ -24,6 +24,16 @@ export const navigations: INavigations = {
       title: 'Patients',
     },
     {
+      url: '/dashboard/clinics',
+      routerLinkActiveOptions: defaultRouterLinkActiveOptions,
+      queryParams: {
+        page: 1,
+        per_page: 5,
+      },
+      icon: 'pi pi-flag-fill',
+      title: 'Clinics',
+    },
+    {
       url: '/dashboard/medicines',
       routerLinkActiveOptions: defaultRouterLinkActiveOptions,
       queryParams: {
@@ -55,3 +65,23 @@ export const navigations: INavigations = {
     },
   ],
 };
+
+// {
+//   admin: all,
+//   doctor: [
+//     diagnose (crud),
+//     prescription (crud),
+//     treatments (crud),
+//   ],
+//   nurse: [
+//     medicines (crud),
+//     treatments (crud),
+//     clinics (crud),
+//   ],
+//   receptionist: [
+//     appointment (crud),
+//     clinics (crud),
+//     prescription (crud),
+//     bills (crud),
+//   ],
+// }
