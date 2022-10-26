@@ -34,6 +34,16 @@ export const navigations: INavigations = {
       title: 'Clinics',
     },
     {
+      url: '/dashboard/treatments',
+      routerLinkActiveOptions: defaultRouterLinkActiveOptions,
+      queryParams: {
+        page: 1,
+        per_page: 5,
+      },
+      icon: 'pi pi-flag',
+      title: 'Treatments',
+    },
+    {
       url: '/dashboard/medicines',
       routerLinkActiveOptions: defaultRouterLinkActiveOptions,
       queryParams: {
