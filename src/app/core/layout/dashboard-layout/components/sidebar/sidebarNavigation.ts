@@ -55,3 +55,23 @@ export const navigations: INavigations = {
     },
   ],
 };
+
+// {
+//   admin: all,
+//   doctor: [
+//     diagnose (crud),
+//     prescription (crud),
+//     treatments (crud),
+//   ],
+//   nurse: [
+//     medicines (crud),
+//     treatments (crud),
+//     clinics (crud),
+//   ],
+//   receptionist: [
+//     appointment (crud),
+//     clinics (crud),
+//     prescription (crud),
+//     bills (crud),
+//   ],
+// }
