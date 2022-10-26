@@ -133,6 +133,7 @@ export class PatientsComponent implements OnInit {
   }
 
   onAddPreview(): void {
+    this.selectedPatientId = undefined;
     this.onToggleForm();
     this.patientForm.reset();
   }

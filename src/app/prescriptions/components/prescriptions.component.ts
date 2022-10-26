@@ -153,6 +153,7 @@ export class PrescriptionsComponent implements OnInit {
   }
 
   onAddPreview(): void {
+    this.selectedPrescriptionId = undefined;
     this.onToggleForm();
     this.prescriptionForm.reset();
   }

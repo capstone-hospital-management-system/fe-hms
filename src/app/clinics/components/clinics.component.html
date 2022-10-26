@@ -1,0 +1,140 @@
+<p-toast></p-toast>
+<p-confirmDialog [baseZIndex]="3" styleClass="md:max-w-[30vw]"></p-confirmDialog>
+
+<div class="container p-5">
+  <div class="flex mb-5">
+    <div class="mr-4">
+      <button
+        pButton
+        label="New Clinic"
+        icon="pi pi-plus"
+        class="p-button-success p-button-sm"
+        (click)="onAddPreview()"></button>
+    </div>
+    <div *ngIf="false" class="mr-auto">
+      <button pButton label="Bulk Delete" icon="pi pi-trash" class="p-button-danger p-button-sm"></button>
+    </div>
+  </div>
+
+  <p-table
+    #dt
+    dataKey="id"
+    responsiveLayout="scroll"
+    [value]="clinics"
+    [rows]="perPage"
+    [rowHover]="!isClinicListLoading"
+    [rowsPerPageOptions]="[5, 10, 25, 50, 100]">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="text-sm">ID</th>
+        <th class="text-sm">Name</th>
+        <th class="text-sm">Desciption</th>
+        <th class="text-sm">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-clinic>
+      <tr *ngIf="isClinicListLoading">
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+      </tr>
+
+      <tr *ngIf="!isClinicListLoading">
+        <td class="text-sm">
+          {{ clinic.id }}
+        </td>
+        <td class="text-sm">
+          {{ clinic.name }}
+        </td>
+        <td class="text-sm">
+          {{ clinic.description }}
+        </td>
+        <td>
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-warning p-button-sm mr-2"
+            [disabled]="isDeleteLoading"
+            [loading]="clinic.id === selectedClinicId && isClinicDetailLoading"
+            (click)="onEditPreview(clinic)"></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-danger p-button-sm"
+            [disabled]="isDeleteLoading"
+            [loading]="clinic.id === selectedClinicId && isDeleteLoading"
+            (click)="onDeletePreview(clinic.id)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-paginator
+    class="custom-pagination"
+    styleClass="mt-4"
+    [rows]="perPage"
+    [totalRecords]="totalData"
+    [rowsPerPageOptions]="[5, 10, 25, 50, 100]"
+    (onPageChange)="onChangePage($event)"></p-paginator>
+
+  <p-dialog
+    [header]="selectedClinicId ? 'Edit Clinic' : 'New Clinic'"
+    position="top"
+    responsiveLayout="scroll"
+    [(visible)]="isClinicFormVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="!isSubmitLoading"
+    [style]="{ width: '100%', 'max-width': '30vw' }"
+    (onHide)="onHideForm()">
+    <form [formGroup]="clinicForm" class="grid gap-4" style="padding-top: 1px" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <p class="text-sm mb-2">Name</p>
+        <input
+          formControlName="name"
+          id="name"
+          type="text"
+          pInputText
+          placeholder="Name"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && clinicForm.controls['name'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && clinicForm.controls['name'].errors" class="p-error block mt-1">
+          Name is required!
+        </small>
+      </div>
+
+      <div class="field">
+        <p class="text-sm mb-2">Description</p>
+        <textarea
+          pInputTextarea
+          formControlName="description"
+          id="description"
+          type="text"
+          [rows]="5"
+          [cols]="30"
+          placeholder="Description"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && clinicForm.controls['description'].errors
+          }"
+          class="p-inputtext-sm w-full"></textarea>
+        <small *ngIf="isSubmitted && clinicForm.controls['description'].errors" class="p-error block">
+          Description is required!
+        </small>
+      </div>
+
+      <div class="text-end mt-7">
+        <button
+          pButton
+          label="Save"
+          type="submit"
+          class="p-button-primary p-button-sm py-2 px-10"
+          [loading]="isSubmitLoading"></button>
+      </div>
+    </form>
+  </p-dialog>
+</div>
