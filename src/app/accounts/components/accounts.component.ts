@@ -64,7 +64,7 @@ export class AccountsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private accountsService: AccountsService 
+    private accountsService: AccountsService
   ) {}
 
   ngOnInit(): void {
@@ -183,7 +183,6 @@ export class AccountsComponent implements OnInit {
   onSubmit() {
     this.isSubmitted = true;
     if (this.accountForm.invalid) return;
-    console.log("submit");
     this.isSubmitLoading = true;
     const payload: IAccountRequestDTO = this.accountForm.value;
     const submitService = this.selectedAccountId

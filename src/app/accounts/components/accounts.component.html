@@ -115,9 +115,9 @@
     [draggable]="false"
     [resizable]="false"
     [closable]="!isSubmitLoading"
-    [style]="{ width: '100%', 'max-width': '50vw' }"
+    [style]="{ width: '100%', 'max-width': '30vw' }"
     (onHide)="onHideForm()">
-    <form [formGroup]="accountForm" class="grid grid-cols-2 gap-4" style="padding-top: 1px" (ngSubmit)="onSubmit()">
+    <form [formGroup]="accountForm" class="grid gap-4" style="padding-top: 1px" (ngSubmit)="onSubmit()">
       <div class="field">
         <p class="text-sm mb-2">Username</p>
         <input
@@ -130,25 +130,8 @@
             'ng-invalid ng-dirty': isSubmitted && accountForm.controls['username'].errors
           }"
           class="p-inputtext-sm w-full" />
-        <small *ngIf="isSubmitted && accountForm.controls['username'].errors" id="username" class="p-error block mt-1">
+        <small *ngIf="isSubmitted && accountForm.controls['username'].errors" class="p-error block mt-1">
           Username is required!
-        </small>
-      </div>
-
-      <div class="field">
-        <p class="text-sm mb-2">Password</p>
-        <input
-          formControlName="password"
-          id="password"
-          type="password"
-          pInputText
-          placeholder="Password"
-          [ngClass]="{
-            'ng-invalid ng-dirty': isSubmitted && accountForm.controls['password'].errors
-          }"
-          class="p-inputtext-sm w-full" />
-        <small *ngIf="isSubmitted && accountForm.controls['password'].errors" id="password" class="p-error block mt-1">
-          Password is required!
         </small>
       </div>
 
@@ -164,7 +147,7 @@
             'ng-invalid ng-dirty': isSubmitted && accountForm.controls['first_name'].errors
           }"
           class="p-inputtext-sm w-full" />
-        <small *ngIf="isSubmitted && accountForm.controls['first_name'].errors" id="first_name" class="p-error block mt-1">
+        <small *ngIf="isSubmitted && accountForm.controls['first_name'].errors" class="p-error block mt-1">
           Firstname is required!
         </small>
       </div>
@@ -181,7 +164,7 @@
             'ng-invalid ng-dirty': isSubmitted && accountForm.controls['last_name'].errors
           }"
           class="p-inputtext-sm w-full" />
-        <small *ngIf="isSubmitted && accountForm.controls['last_name'].errors" id="last_name" class="p-error block mt-1">
+        <small *ngIf="isSubmitted && accountForm.controls['last_name'].errors" class="p-error block mt-1">
           Lastname is required!
         </small>
       </div>
@@ -193,13 +176,13 @@
           id="email"
           type="email"
           pInputText
-          placeholder="email"
+          placeholder="Email"
           [ngClass]="{
             'ng-invalid ng-dirty': isSubmitted && accountForm.controls['email'].errors
           }"
           class="p-inputtext-sm w-full" />
-        <small *ngIf="isSubmitted && accountForm.controls['email'].errors" id="email" class="p-error block mt-1">
-          ID Card is required!
+        <small *ngIf="isSubmitted && accountForm.controls['email'].errors" class="p-error block mt-1">
+          Email is required!
         </small>
       </div>
 
@@ -215,7 +198,7 @@
             'ng-invalid ng-dirty': isSubmitted && accountForm.controls['id_card'].errors
           }"
           class="p-inputtext-sm w-full" />
-        <small *ngIf="isSubmitted && accountForm.controls['id_card'].errors" id="id_card" class="p-error block mt-1">
+        <small *ngIf="isSubmitted && accountForm.controls['id_card'].errors" class="p-error block mt-1">
           ID Card is required!
         </small>
       </div>
@@ -233,12 +216,12 @@
             'ng-invalid ng-dirty': isSubmitted && accountForm.controls['role'].errors
           }"
           class="w-full"></p-dropdown>
-        <small *ngIf="isSubmitted && accountForm.controls['role'].errors" id="role" class="p-error block mt-1">
+        <small *ngIf="isSubmitted && accountForm.controls['role'].errors" class="p-error block mt-1">
           Role is required!
         </small>
       </div>
 
-      <div class="field col-span-2">
+      <div class="field">
         <p class="text-sm mb-2">Phone</p>
         <input
           formControlName="phone_number"
@@ -258,7 +241,24 @@
         </small>
       </div>
 
-      <div class="text-end col-span-2 mt-7">
+      <div class="field">
+        <p class="text-sm mb-2">Password</p>
+        <input
+          formControlName="password"
+          id="password"
+          type="password"
+          pInputText
+          placeholder="Password"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && accountForm.controls['password'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && accountForm.controls['password'].errors" class="p-error block mt-1">
+          Password is required!
+        </small>
+      </div>
+
+      <div class="text-end mt-7">
         <button
           pButton
           label="Save"
