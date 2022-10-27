@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -15,18 +15,15 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CalendarModule } from 'primeng/calendar';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { DropdownModule } from 'primeng/dropdown';
 
-import { PrescriptionsService } from '../services/prescriptions.service';
-import { IPrescriptionRequestDTO, IPrescriptionResponseDTO } from '../dtos/IPrescriptionsDTO';
-import { prescriptionFields } from '../models/prescriptions';
-import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
+import { TreatmentsService } from '../services/treatments.service';
+import { ITreatmentRequestDTO, ITreatmentResponseDTO } from '../dtos/ITreatmentsDTO';
+import { treatmentFields } from '../models/treatments';
 
 @Component({
-  selector: 'app-prescriptions',
-  templateUrl: './prescriptions.component.html',
-  styleUrls: ['./prescriptions.component.scss'],
+  selector: 'app-treatments',
+  templateUrl: './treatments.component.html',
+  styleUrls: ['./treatments.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -42,23 +39,20 @@ import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
     InputNumberModule,
     InputTextareaModule,
     CalendarModule,
-    RadioButtonModule,
-    DropdownModule,
   ],
-  providers: [MessageService, ConfirmationService, PrescriptionsService],
+  providers: [MessageService, ConfirmationService, TreatmentsService],
 })
-export class PrescriptionsComponent implements OnInit {
+export class TreatmentsComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
-  prescriptionForm: FormGroup = new FormGroup({});
-  isPrescriptionFormVisible: boolean = false;
-  prescriptions: IPrescriptionResponseDTO[] = [];
+  treatmentForm: FormGroup = new FormGroup({});
+  isTreatmentFormVisible: boolean = false;
+  treatments: ITreatmentResponseDTO[] = [];
   diagnoseList: any[] = [];
-  medicineList: IMedicineResponseDTO[] = [];
-  selectedPrescriptionId: number | undefined;
+  selectedTreatmentId: number | undefined;
   isSubmitted: boolean = false;
   isSubmitLoading: boolean = false;
-  isPrescriptionListLoading: boolean = false;
-  isPrescriptionDetailLoading: boolean = false;
+  isTreatmentListLoading: boolean = false;
+  isTreatmentDetailLoading: boolean = false;
   isDeleteLoading: boolean = false;
 
   currentPage: number = 1;
@@ -71,65 +65,48 @@ export class PrescriptionsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private prescriptionsService: PrescriptionsService
+    private treatmentsService: TreatmentsService
   ) {}
 
   ngOnInit(): void {
-    prescriptionFields.forEach(field => {
-      if (field.key === 'medicine_ids') {
-        const formArray = new FormArray([], Validators.required);
-        this.prescriptionForm.addControl(field.key, formArray);
-      } else {
-        const formControl = new FormControl('');
-        if (field.isRequired) {
-          formControl.addValidators(Validators.required);
-        }
-        if (field.regexPattern) {
-          formControl.addValidators(Validators.pattern(field.regexPattern));
-        }
-        this.prescriptionForm.addControl(field.key, formControl);
+    treatmentFields.forEach(field => {
+      const formControl: FormControl = new FormControl('');
+      if (field.isRequired) {
+        formControl.addValidators(Validators.required);
       }
+      if (field.regexPattern) {
+        formControl.addValidators(Validators.pattern(field.regexPattern));
+      }
+      this.treatmentForm.addControl(field.key, formControl);
     });
 
     let queryParams = {};
     this.activatedRoute.queryParams.subscribe(params => {
       queryParams = params;
     });
-    this.onGetPrescriptions(queryParams);
+    this.onGetTreatments(queryParams);
   }
 
-  onGetPrescriptions(params?: { [key: string]: string | number }): void {
+  onGetTreatments(params?: { [key: string]: string | number }): void {
     const queryParams = {
       page: params ? params['page'] : this.currentPage,
       size: params ? params['per_page'] : this.perPage,
     };
-    this.isPrescriptionListLoading = true;
-    this.prescriptionsService
+    this.isTreatmentListLoading = true;
+    this.treatmentsService
       .get(queryParams)
       .pipe(takeUntil(this.ngUnsubsribe))
       .subscribe({
         next: res => {
-          this.prescriptions = res.data;
+          this.treatments = res.data;
           this.totalData = res.meta?.total_data as number;
-          this.isPrescriptionListLoading = false;
+          this.isTreatmentListLoading = false;
         },
         error: error => {
           console.error(error);
-          this.isPrescriptionListLoading = false;
+          this.isTreatmentListLoading = false;
         },
       });
-  }
-
-  get medicineIds() {
-    return this.prescriptionForm.get('medicine_ids') as FormArray;
-  }
-
-  onAddMedicine(): void {
-    this.medicineIds.push(new FormControl('', Validators.required));
-  }
-
-  onRemoveMedicine(index: number): void {
-    this.medicineIds.removeAt(index);
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
@@ -139,36 +116,36 @@ export class PrescriptionsComponent implements OnInit {
       page: pagination.page + 1,
       per_page: pagination.rows,
     };
-    this.router.navigate(['/dashboard/prescriptions'], { queryParams, replaceUrl: true });
-    this.onGetPrescriptions(queryParams);
+    this.router.navigate(['/dashboard/treatments'], { queryParams, replaceUrl: true });
+    this.onGetTreatments(queryParams);
   }
 
   onToggleForm(): void {
-    this.isPrescriptionFormVisible = !this.isPrescriptionFormVisible;
+    this.isTreatmentFormVisible = !this.isTreatmentFormVisible;
   }
 
   onHideForm(): void {
-    this.prescriptionForm.reset();
+    this.treatmentForm.reset();
     this.isSubmitted = false;
   }
 
   onAddPreview(): void {
-    this.selectedPrescriptionId = undefined;
+    this.selectedTreatmentId = undefined;
     this.onToggleForm();
-    this.prescriptionForm.reset();
+    this.treatmentForm.reset();
   }
 
-  onEditPreview(prescription: IPrescriptionResponseDTO): void {
-    this.selectedPrescriptionId = prescription.id;
-    this.prescriptionForm.patchValue(prescription);
+  onEditPreview(treatment: ITreatmentResponseDTO): void {
+    this.selectedTreatmentId = treatment.id;
+    this.treatmentForm.patchValue(treatment);
     this.onToggleForm();
   }
 
   onDeletePreview(id: number) {
-    this.selectedPrescriptionId = id;
+    this.selectedTreatmentId = id;
     this.confirmationService.confirm({
-      header: 'Delete Prescription',
-      message: 'Do you want to delete this prescription? Prescription will deleted permanently, so be careful',
+      header: 'Delete Treatment',
+      message: 'Do you want to delete this treatment? Treatment will deleted permanently, so be careful',
       icon: 'pi pi-info-circle',
       defaultFocus: 'none',
       acceptIcon: '',
@@ -176,7 +153,7 @@ export class PrescriptionsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-outlined p-button-danger p-button-sm',
       accept: () => {
         this.isDeleteLoading = true;
-        this.prescriptionsService
+        this.treatmentsService
           .delete(id)
           .pipe(takeUntil(this.ngUnsubsribe))
           .subscribe({
@@ -184,10 +161,10 @@ export class PrescriptionsComponent implements OnInit {
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Prescription Deleted!',
+                detail: 'Treatment Deleted!',
               });
-              this.selectedPrescriptionId = undefined;
-              this.onGetPrescriptions();
+              this.selectedTreatmentId = undefined;
+              this.onGetTreatments();
             },
             complete: () => {
               this.isDeleteLoading = false;
@@ -197,32 +174,32 @@ export class PrescriptionsComponent implements OnInit {
       rejectLabel: 'Cancel',
       rejectButtonStyleClass: 'p-button-primary p-button-sm',
       reject: () => {
-        this.selectedPrescriptionId = undefined;
+        this.selectedTreatmentId = undefined;
       },
     });
   }
 
   onSubmit() {
     this.isSubmitted = true;
-    if (this.prescriptionForm.invalid) return;
-    this.prescriptionForm.patchValue({ status: 'WAITING_PAYMENT' });
+    if (this.treatmentForm.invalid) return;
+    this.treatmentForm.patchValue({ status: 'WAITING' });
     this.isSubmitLoading = true;
-    const payload: IPrescriptionRequestDTO = this.prescriptionForm.value;
-    const submitService = this.selectedPrescriptionId
-      ? this.prescriptionsService.update(this.selectedPrescriptionId, payload)
-      : this.prescriptionsService.create(payload);
+    const payload: ITreatmentRequestDTO = this.treatmentForm.value;
+    const submitService = this.selectedTreatmentId
+      ? this.treatmentsService.update(this.selectedTreatmentId, payload)
+      : this.treatmentsService.create(payload);
     submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
       next: () => {
         this.isSubmitted = false;
         this.isSubmitLoading = false;
-        this.prescriptionForm.reset();
+        this.treatmentForm.reset();
         this.onToggleForm();
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: this.selectedPrescriptionId ? 'Prescription Updated!' : 'Prescription Created!',
+          detail: this.selectedTreatmentId ? 'Treatment Updated!' : 'Treatment Created!',
         });
-        this.onGetPrescriptions();
+        this.onGetTreatments();
       },
       error: error => {
         console.error(error);
