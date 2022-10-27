@@ -18,15 +18,15 @@ import { CalendarModule } from 'primeng/calendar';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { DropdownModule } from 'primeng/dropdown';
 
-import { PrescriptionsService } from '../services/prescriptions.service';
-import { IPrescriptionRequestDTO, IPrescriptionResponseDTO } from '../dtos/IPrescriptionsDTO';
-import { prescriptionFields } from '../models/prescriptions';
+import { DiagnosesService } from '../services/diagnoses.service';
+import { IDiagnoseRequestDTO, IDiagnoseResponseDTO } from '../dtos/IDiagnosesDTO';
+import { diagnoseFields } from '../models/diagnoses';
 import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
 
 @Component({
-  selector: 'app-prescriptions',
-  templateUrl: './prescriptions.component.html',
-  styleUrls: ['./prescriptions.component.scss'],
+  selector: 'app-diagnoses',
+  templateUrl: './diagnoses.component.html',
+  styleUrls: ['./diagnoses.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -45,20 +45,20 @@ import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
     RadioButtonModule,
     DropdownModule,
   ],
-  providers: [MessageService, ConfirmationService, PrescriptionsService],
+  providers: [MessageService, ConfirmationService, DiagnosesService],
 })
-export class PrescriptionsComponent implements OnInit {
+export class DiagnosesComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
-  prescriptionForm: FormGroup = new FormGroup({});
-  isPrescriptionFormVisible: boolean = false;
-  prescriptions: IPrescriptionResponseDTO[] = [];
-  diagnoseList: any[] = [];
+  diagnoseForm: FormGroup = new FormGroup({});
+  isDiagnoseFormVisible: boolean = false;
+  diagnoses: IDiagnoseResponseDTO[] = [];
+  appointmentList: any[] = [];
   medicineList: IMedicineResponseDTO[] = [];
-  selectedPrescriptionId: number | undefined;
+  selectedDiagnoseId: number | undefined;
   isSubmitted: boolean = false;
   isSubmitLoading: boolean = false;
-  isPrescriptionListLoading: boolean = false;
-  isPrescriptionDetailLoading: boolean = false;
+  isDiagnoseListLoading: boolean = false;
+  isDiagnoseDetailLoading: boolean = false;
   isDeleteLoading: boolean = false;
 
   currentPage: number = 1;
@@ -71,14 +71,14 @@ export class PrescriptionsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private prescriptionsService: PrescriptionsService
+    private diagnosesService: DiagnosesService
   ) {}
 
   ngOnInit(): void {
-    prescriptionFields.forEach(field => {
+    diagnoseFields.forEach(field => {
       if (field.key === 'medicine_ids') {
         const formArray = new FormArray([], Validators.required);
-        this.prescriptionForm.addControl(field.key, formArray);
+        this.diagnoseForm.addControl(field.key, formArray);
       } else {
         const formControl = new FormControl('');
         if (field.isRequired) {
@@ -87,7 +87,7 @@ export class PrescriptionsComponent implements OnInit {
         if (field.regexPattern) {
           formControl.addValidators(Validators.pattern(field.regexPattern));
         }
-        this.prescriptionForm.addControl(field.key, formControl);
+        this.diagnoseForm.addControl(field.key, formControl);
       }
     });
 
@@ -95,33 +95,33 @@ export class PrescriptionsComponent implements OnInit {
     this.activatedRoute.queryParams.subscribe(params => {
       queryParams = params;
     });
-    this.onGetPrescriptions(queryParams);
+    this.onGetDiagnoses(queryParams);
   }
 
-  onGetPrescriptions(params?: { [key: string]: string | number }): void {
+  onGetDiagnoses(params?: { [key: string]: string | number }): void {
     const queryParams = {
       page: params ? params['page'] : this.currentPage,
       size: params ? params['per_page'] : this.perPage,
     };
-    this.isPrescriptionListLoading = true;
-    this.prescriptionsService
+    this.isDiagnoseListLoading = true;
+    this.diagnosesService
       .get(queryParams)
       .pipe(takeUntil(this.ngUnsubsribe))
       .subscribe({
         next: res => {
-          this.prescriptions = res.data;
+          this.diagnoses = res.data;
           this.totalData = res.meta?.total_data as number;
-          this.isPrescriptionListLoading = false;
+          this.isDiagnoseListLoading = false;
         },
         error: error => {
           console.error(error);
-          this.isPrescriptionListLoading = false;
+          this.isDiagnoseListLoading = false;
         },
       });
   }
 
   get medicineIds() {
-    return this.prescriptionForm.get('medicine_ids') as FormArray;
+    return this.diagnoseForm.get('medicine_ids') as FormArray;
   }
 
   onAddMedicine(): void {
@@ -139,36 +139,36 @@ export class PrescriptionsComponent implements OnInit {
       page: pagination.page + 1,
       per_page: pagination.rows,
     };
-    this.router.navigate(['/dashboard/prescriptions'], { queryParams, replaceUrl: true });
-    this.onGetPrescriptions(queryParams);
+    this.router.navigate(['/dashboard/diagnoses'], { queryParams, replaceUrl: true });
+    this.onGetDiagnoses(queryParams);
   }
 
   onToggleForm(): void {
-    this.isPrescriptionFormVisible = !this.isPrescriptionFormVisible;
+    this.isDiagnoseFormVisible = !this.isDiagnoseFormVisible;
   }
 
   onHideForm(): void {
-    this.prescriptionForm.reset();
+    this.diagnoseForm.reset();
     this.isSubmitted = false;
   }
 
   onAddPreview(): void {
-    this.selectedPrescriptionId = undefined;
+    this.selectedDiagnoseId = undefined;
     this.onToggleForm();
-    this.prescriptionForm.reset();
+    this.diagnoseForm.reset();
   }
 
-  onEditPreview(prescription: IPrescriptionResponseDTO): void {
-    this.selectedPrescriptionId = prescription.id;
-    this.prescriptionForm.patchValue(prescription);
+  onEditPreview(diagnose: IDiagnoseResponseDTO): void {
+    this.selectedDiagnoseId = diagnose.id;
+    this.diagnoseForm.patchValue(diagnose);
     this.onToggleForm();
   }
 
   onDeletePreview(id: number) {
-    this.selectedPrescriptionId = id;
+    this.selectedDiagnoseId = id;
     this.confirmationService.confirm({
-      header: 'Delete Prescription',
-      message: 'Do you want to delete this prescription? Prescription will deleted permanently, so be careful',
+      header: 'Delete Diagnose',
+      message: 'Do you want to delete this diagnose? Diagnose will deleted permanently, so be careful',
       icon: 'pi pi-info-circle',
       defaultFocus: 'none',
       acceptIcon: '',
@@ -176,7 +176,7 @@ export class PrescriptionsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-outlined p-button-danger p-button-sm',
       accept: () => {
         this.isDeleteLoading = true;
-        this.prescriptionsService
+        this.diagnosesService
           .delete(id)
           .pipe(takeUntil(this.ngUnsubsribe))
           .subscribe({
@@ -184,10 +184,10 @@ export class PrescriptionsComponent implements OnInit {
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Prescription Deleted!',
+                detail: 'Diagnose Deleted!',
               });
-              this.selectedPrescriptionId = undefined;
-              this.onGetPrescriptions();
+              this.selectedDiagnoseId = undefined;
+              this.onGetDiagnoses();
             },
             complete: () => {
               this.isDeleteLoading = false;
@@ -197,32 +197,32 @@ export class PrescriptionsComponent implements OnInit {
       rejectLabel: 'Cancel',
       rejectButtonStyleClass: 'p-button-primary p-button-sm',
       reject: () => {
-        this.selectedPrescriptionId = undefined;
+        this.selectedDiagnoseId = undefined;
       },
     });
   }
 
   onSubmit() {
     this.isSubmitted = true;
-    if (this.prescriptionForm.invalid) return;
-    this.prescriptionForm.patchValue({ status: 'WAITING_PAYMENT' });
+    if (this.diagnoseForm.invalid) return;
+    this.diagnoseForm.patchValue({ status: 'WAITING_PAYMENT' });
     this.isSubmitLoading = true;
-    const payload: IPrescriptionRequestDTO = this.prescriptionForm.value;
-    const submitService = this.selectedPrescriptionId
-      ? this.prescriptionsService.update(this.selectedPrescriptionId, payload)
-      : this.prescriptionsService.create(payload);
+    const payload: IDiagnoseRequestDTO = this.diagnoseForm.value;
+    const submitService = this.selectedDiagnoseId
+      ? this.diagnosesService.update(this.selectedDiagnoseId, payload)
+      : this.diagnosesService.create(payload);
     submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
       next: () => {
         this.isSubmitted = false;
         this.isSubmitLoading = false;
-        this.prescriptionForm.reset();
+        this.diagnoseForm.reset();
         this.onToggleForm();
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: this.selectedPrescriptionId ? 'Prescription Updated!' : 'Prescription Created!',
+          detail: this.selectedDiagnoseId ? 'Diagnose Updated!' : 'Diagnose Created!',
         });
-        this.onGetPrescriptions();
+        this.onGetDiagnoses();
       },
       error: error => {
         console.error(error);
