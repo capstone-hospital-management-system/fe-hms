@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
-// import { AuthGuard } from './core/guard/auth.guard';
+import { AuthGuard } from './core/guard/auth.guard';
 import { ErrorPageComponent } from './core/pages/error-page/error-page.component';
 import { AuthLayoutComponent } from './core/layout/auth-layout/auth-layout.component';
 import { DashboardLayoutComponent } from './core/layout/dashboard-layout/dashboard-layout.component';
@@ -33,8 +33,8 @@ import { DashboardLayoutComponent } from './core/layout/dashboard-layout/dashboa
         },
         {
           path: 'dashboard',
-          // canLoad: [AuthGuard],
-          // canActivate: [AuthGuard],
+          canLoad: [AuthGuard],
+          canActivate: [AuthGuard],
           component: DashboardLayoutComponent,
           children: [
             {
