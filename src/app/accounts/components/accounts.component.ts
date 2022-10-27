@@ -130,12 +130,14 @@ export class AccountsComponent implements OnInit {
   }
 
   onAddPreview(): void {
+    this.accountForm.setControl('password', new FormControl('', Validators.required));
     this.selectedAccountId = undefined;
     this.onToggleForm();
     this.accountForm.reset();
   }
 
   onEditPreview(account: IAccountResponseDTO): void {
+    this.accountForm.setControl('password', new FormControl(''));
     this.selectedAccountId = account.id;
     this.accountForm.patchValue(account);
     this.onToggleForm();
