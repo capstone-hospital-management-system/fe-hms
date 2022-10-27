@@ -6,11 +6,12 @@ import { MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
-import { Subject, switchMap, takeUntil } from 'rxjs';
+import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { AuthService } from '../../services/auth/auth.service';
 import { SessionService } from '../../services/session/session.service';
-import { IAccountResponseDTO } from '../../dtos/IAuth';
+import { IAccountResponseDTO, ILoginRequestDTO, ILoginResponseDTO } from '../../dtos/IAuth';
+import { IBaseResponseDTO } from 'src/app/core/dtos/IBaseResponseDTO';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,7 @@ import { IAccountResponseDTO } from '../../dtos/IAuth';
 export class LoginComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
   loginForm: FormGroup = new FormGroup({
-    username: new FormControl('', Validators.required),
+    username_or_email: new FormControl('', Validators.required),
     password: new FormControl('', Validators.required),
   });
   isSubmitted: boolean = false;
@@ -45,6 +46,10 @@ export class LoginComponent implements OnInit {
         username: params['email'],
       });
     });
+
+    if (this.sessionService.getAccessToken()) {
+      this.router.navigate(['/dashboard']);
+    }
   }
 
   onShowErrorLogin(): void {
@@ -65,30 +70,28 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     this.isSubmitted = true;
+
     if (this.loginForm.invalid) return;
-    // this.isLoading = true;
-    // this.authService
-    //   .login(this.loginForm.value)
-    //   .pipe(
-    //     switchMap(res => {
-    //       if (res) localStorage.setItem('access_token', res.data.access_token);
-    //       return this.authService.accountInfo();
-    //     }),
-    //     takeUntil(this.ngUnsubsribe)
-    //   )
-    //   .subscribe({
-    //     next: res => {
-    //       this.sessionService.createSession(res.data);
-    //       this.onShowSuccessLogin(res.data);
-    //       setTimeout(() => {
-    //         this.isSubmitted = false;
-    //         this.isLoading = false;
-    //         this.router.navigateByUrl('/dashboard');
-    //       }, 1000);
-    //     },
-    //     error: () => {
-    //       this.onShowErrorLogin();
-    //     },
-    //   });
+    this.isLoading = true;
+    this.authService
+      .authenticate(this.loginForm.value)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          console.log(res);
+          if (res) localStorage.setItem('access_token', res.data.access_token);
+          this.sessionService.createSession(res.data.account_info);
+          this.onShowSuccessLogin(res.data.account_info);
+          setTimeout(() => {
+            this.isSubmitted = false;
+            this.isLoading = false;
+            this.router.navigateByUrl('/dashboard');
+          }, 1000);
+        },
+        error: () => {
+          this.onShowErrorLogin();
+        },
+      });
   }
+
 }
