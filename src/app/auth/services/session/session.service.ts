@@ -10,11 +10,11 @@ export class SessionService {
   constructor() {}
 
   createSession(account: IAccountResponseDTO): void {
-    localStorage.setItem('account_info', JSON.stringify(account));
+    sessionStorage.setItem('account_info', JSON.stringify(account));
   }
 
   getSession(): IAccountResponseDTO {
-    return JSON.parse(localStorage.getItem('account_info') as string);
+    return JSON.parse(sessionStorage.getItem('account_info') as string);
   }
 
   getAccessToken(): any {
