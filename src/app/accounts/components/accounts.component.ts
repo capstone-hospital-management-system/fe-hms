@@ -98,7 +98,6 @@ export class AccountsComponent implements OnInit {
       .pipe(takeUntil(this.ngUnsubsribe))
       .subscribe({
         next: res => {
-          console.log(res.data);
           this.accounts = res.data;
           this.totalData = res.meta?.total_data as number;
           this.isAccountListLoading = false;

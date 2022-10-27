@@ -20,7 +20,7 @@ export const navigations: INavigations = {
         page: 1,
         per_page: 5,
       },
-      icon: 'pi pi-users',
+      icon: 'pi pi-verified',
       title: 'Accounts',
     },
     {
