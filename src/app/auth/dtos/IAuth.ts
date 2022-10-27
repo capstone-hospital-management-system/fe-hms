@@ -1,5 +1,5 @@
 export interface ILoginRequestDTO {
-  username: string;
+  username_or_email: string;
   password: string;
 }
 
@@ -9,8 +9,14 @@ export interface IAccountResponseDTO {
   last_name: string;
   username: string;
   email: string;
-  role: string;
+  authorities: [];
   id_card: string;
   others: string;
   phone_number: string;
+}
+
+export interface ILoginResponseDTO {
+  access_token: string;
+  token_type: string;
+  account_info: IAccountResponseDTO;
 }

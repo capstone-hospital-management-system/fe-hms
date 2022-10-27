@@ -4,21 +4,21 @@ import { Observable } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
 import { IBaseResponseDTO } from 'src/app/core/dtos/IBaseResponseDTO';
-import { ILoginRequestDTO, IAccountResponseDTO } from './../../dtos/IAuth';
+import { ILoginRequestDTO, IAccountResponseDTO, ILoginResponseDTO } from './../../dtos/IAuth';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private signinUrl: string = `${environment.baseUrl}/signin`;
+  private signinUrl: string = `${environment.baseUrl}/auth/sign-in`;
   private meUrl: string = `${environment.baseUrl}/me`;
 
   constructor(private http: HttpClient) {}
 
-  login(body: ILoginRequestDTO): Observable<IBaseResponseDTO<IAccountResponseDTO>> {
-    return this.http.post<IBaseResponseDTO<IAccountResponseDTO>>(this.signinUrl, body);
+  authenticate(body: ILoginRequestDTO): Observable<IBaseResponseDTO<ILoginResponseDTO>> {
+    return this.http.post<IBaseResponseDTO<ILoginResponseDTO>>(this.signinUrl, body);
   }
-  accountInfo() {
-    return this.http.get<IBaseResponseDTO<IAccountResponseDTO>>(this.meUrl);
+  accountInfo(): Observable<IBaseResponseDTO<ILoginResponseDTO>> {
+    return this.http.get<IBaseResponseDTO<ILoginResponseDTO>>(this.meUrl);
   }
 }
