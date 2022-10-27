@@ -16,20 +16,17 @@
                 <i class="pi pi-at"></i>
                 <input
                   formControlName="username_or_email"
-                  id="username"
+                  id="username_or_email"
                   type="text"
                   pInputText
                   placeholder="Username / Email"
                   [ngClass]="{
-                    'ng-invalid ng-dirty': isSubmitted && loginForm.controls['username'].errors
+                    'ng-invalid ng-dirty': isSubmitted && loginForm.controls['username_or_email'].errors
                   }"
                   class="p-inputtext-sm w-full"
-                  aria-label="username" />
+                  aria-label="username_or_email" />
               </div>
-              <small
-                *ngIf="isSubmitted && loginForm.controls['username'].errors"
-                id="username"
-                class="p-error block mt-2">
+              <small *ngIf="isSubmitted && loginForm.controls['username_or_email'].errors" class="p-error block mt-2">
                 Username / Email invalid!
               </small>
             </div>
@@ -47,10 +44,7 @@
                   class="p-inputtext-sm w-full"
                   aria-label="password" />
               </div>
-              <small
-                *ngIf="isSubmitted && loginForm.controls['password'].errors"
-                id="password"
-                class="p-error block mt-2">
+              <small *ngIf="isSubmitted && loginForm.controls['password'].errors" class="p-error block mt-2">
                 Password invalid!
               </small>
             </div>

@@ -33,5 +33,6 @@ export class SessionService {
 
   destroySession(): void {
     localStorage.clear();
+    sessionStorage.clear();
   }
 }

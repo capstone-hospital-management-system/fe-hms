@@ -18,5 +18,5 @@ export interface IAccountResponseDTO {
 export interface ILoginResponseDTO {
   access_token: string;
   token_type: string;
-  account_info: IAccountResponseDTO 
+  account_info: IAccountResponseDTO;
 }

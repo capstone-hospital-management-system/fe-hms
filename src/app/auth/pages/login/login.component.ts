@@ -78,7 +78,6 @@ export class LoginComponent implements OnInit {
       .pipe(takeUntil(this.ngUnsubsribe))
       .subscribe({
         next: res => {
-          console.log(res);
           if (res) localStorage.setItem('access_token', res.data.access_token);
           this.sessionService.createSession(res.data.account_info);
           this.onShowSuccessLogin(res.data.account_info);
@@ -93,5 +92,4 @@ export class LoginComponent implements OnInit {
         },
       });
   }
-
 }
