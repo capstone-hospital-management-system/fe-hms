@@ -14,6 +14,16 @@ export const navigations: INavigations = {
       title: 'Homepage',
     },
     {
+      url: '/dashboard/accounts',
+      routerLinkActiveOptions: defaultRouterLinkActiveOptions,
+      queryParams: {
+        page: 1,
+        per_page: 5,
+      },
+      icon: 'pi pi-users',
+      title: 'Accounts',
+    },
+    {
       url: '/dashboard/patients',
       routerLinkActiveOptions: defaultRouterLinkActiveOptions,
       queryParams: {
