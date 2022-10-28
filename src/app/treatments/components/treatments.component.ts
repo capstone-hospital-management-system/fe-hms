@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -16,9 +16,12 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CalendarModule } from 'primeng/calendar';
 
+import { IDiagnoseResponseDTO } from 'src/app/diagnoses/dtos/IDiagnosesDTO';
+import { DiagnosesService } from 'src/app/diagnoses/services/diagnoses.service';
 import { TreatmentsService } from '../services/treatments.service';
 import { ITreatmentRequestDTO, ITreatmentResponseDTO } from '../dtos/ITreatmentsDTO';
 import { treatmentFields } from '../models/treatments';
+import { RadioButtonModule } from 'primeng/radiobutton';
 
 @Component({
   selector: 'app-treatments',
@@ -39,15 +42,17 @@ import { treatmentFields } from '../models/treatments';
     InputNumberModule,
     InputTextareaModule,
     CalendarModule,
+    RadioButtonModule,
   ],
-  providers: [MessageService, ConfirmationService, TreatmentsService],
+  providers: [MessageService, ConfirmationService, TreatmentsService, DiagnosesService, FormBuilder],
 })
 export class TreatmentsComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
   treatmentForm: FormGroup = new FormGroup({});
   isTreatmentFormVisible: boolean = false;
   treatments: ITreatmentResponseDTO[] = [];
-  diagnoseList: any[] = [];
+  diagnoseList: IDiagnoseResponseDTO[] = [];
+  selectedDiagnose: IDiagnoseResponseDTO | undefined = undefined;
   selectedTreatmentId: number | undefined;
   isSubmitted: boolean = false;
   isSubmitLoading: boolean = false;
@@ -65,26 +70,35 @@ export class TreatmentsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private treatmentsService: TreatmentsService
-  ) {}
+    private treatmentsService: TreatmentsService,
+    private diagnosesService: DiagnosesService,
+    private formBuilder: FormBuilder
+  ) {
+    this.treatmentForm = this.formBuilder.group({
+      diagnose_id: ['', Validators.required],
+      status: ['', Validators.required],
+      report: ['', Validators.required],
+    });
+  }
 
   ngOnInit(): void {
-    treatmentFields.forEach(field => {
-      const formControl: FormControl = new FormControl('');
-      if (field.isRequired) {
-        formControl.addValidators(Validators.required);
-      }
-      if (field.regexPattern) {
-        formControl.addValidators(Validators.pattern(field.regexPattern));
-      }
-      this.treatmentForm.addControl(field.key, formControl);
-    });
+    // treatmentFields.forEach(field => {
+    //   const formControl: FormControl = new FormControl('');
+    //   if (field.isRequired) {
+    //     formControl.addValidators(Validators.required);
+    //   }
+    //   if (field.regexPattern) {
+    //     formControl.addValidators(Validators.pattern(field.regexPattern));
+    //   }
+    //   this.treatmentForm.addControl(field.key, formControl);
+    // });
 
     let queryParams = {};
     this.activatedRoute.queryParams.subscribe(params => {
       queryParams = params;
     });
     this.onGetTreatments(queryParams);
+    this.onGetDiagnoses();
   }
 
   onGetTreatments(params?: { [key: string]: string | number }): void {
@@ -114,6 +128,28 @@ export class TreatmentsComponent implements OnInit {
       });
   }
 
+  onGetDiagnoses(params?: { [key: string]: string | number }): void {
+    const queryParams = {
+      search: params ? params['search'] : '',
+    };
+    this.diagnosesService
+      .get(queryParams)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.diagnoseList = res.data;
+        },
+        error: error => {
+          console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
+        },
+      });
+  }
+
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
     this.currentPage = pagination.page + 1;
     this.perPage = pagination.rows;
@@ -132,6 +168,7 @@ export class TreatmentsComponent implements OnInit {
   onHideForm(): void {
     this.treatmentForm.reset();
     this.isSubmitted = false;
+    this.selectedDiagnose = undefined;
   }
 
   onAddPreview(): void {
@@ -142,7 +179,11 @@ export class TreatmentsComponent implements OnInit {
 
   onEditPreview(treatment: ITreatmentResponseDTO): void {
     this.selectedTreatmentId = treatment.id;
-    this.treatmentForm.patchValue(treatment);
+    this.treatmentForm.patchValue({
+      diagnose_id: treatment.diagnose.id,
+      status: treatment.status,
+      report: treatment.report,
+    });
     this.onToggleForm();
   }
 
@@ -186,8 +227,8 @@ export class TreatmentsComponent implements OnInit {
 
   onSubmit() {
     this.isSubmitted = true;
+    if (!this.selectedTreatmentId) this.treatmentForm.patchValue({ status: 'WAITING' });
     if (this.treatmentForm.invalid) return;
-    this.treatmentForm.patchValue({ status: 'WAITING' });
     this.isSubmitLoading = true;
     const payload: ITreatmentRequestDTO = this.treatmentForm.value;
     const submitService = this.selectedTreatmentId

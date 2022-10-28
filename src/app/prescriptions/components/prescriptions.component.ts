@@ -209,8 +209,8 @@ export class PrescriptionsComponent implements OnInit {
 
   onSubmit() {
     this.isSubmitted = true;
+    if (!this.selectedPrescriptionId) this.prescriptionForm.patchValue({ status: 'WAITING_PAYMENT' });
     if (this.prescriptionForm.invalid) return;
-    this.prescriptionForm.patchValue({ status: 'WAITING_PAYMENT' });
     this.isSubmitLoading = true;
     const payload: IPrescriptionRequestDTO = this.prescriptionForm.value;
     const submitService = this.selectedPrescriptionId

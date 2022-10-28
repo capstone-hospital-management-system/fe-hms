@@ -1,5 +1,7 @@
+import { IDiagnoseResponseDTO } from 'src/app/diagnoses/dtos/IDiagnosesDTO';
+
 export interface ITreatment {
-  diagnose_id: number;
+  diagnose: IDiagnoseResponseDTO;
   report: string;
   status: string;
 }

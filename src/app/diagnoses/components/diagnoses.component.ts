@@ -247,8 +247,8 @@ export class DiagnosesComponent implements OnInit {
 
   onSubmit() {
     this.isSubmitted = true;
+    if (!this.selectedDiagnoseId) this.diagnoseForm.patchValue({ status: 'WAITING_PAYMENT' });
     if (this.diagnoseForm.invalid) return;
-    this.diagnoseForm.patchValue({ status: 'WAITING_PAYMENT' });
     this.isSubmitLoading = true;
     const payload: IDiagnoseRequestDTO = this.diagnoseForm.value;
     const submitService = this.selectedDiagnoseId
