@@ -20,7 +20,7 @@ export const navigations: INavigations = {
         page: 1,
         per_page: 5,
       },
-      icon: 'pi pi-users',
+      icon: 'pi pi-verified',
       title: 'Accounts',
     },
     {
@@ -42,6 +42,16 @@ export const navigations: INavigations = {
       },
       icon: 'pi pi-building',
       title: 'Clinics',
+    },
+    {
+      url: '/dashboard/appointments',
+      routerLinkActiveOptions: defaultRouterLinkActiveOptions,
+      queryParams: {
+        page: 1,
+        per_page: 5,
+      },
+      icon: 'pi pi-calendar-plus',
+      title: 'Appointments',
     },
     {
       url: '/dashboard/diagnoses',

@@ -58,6 +58,12 @@ import { DashboardLayoutComponent } from './core/layout/dashboard-layout/dashboa
               loadComponent: () => import('./clinics/components/clinics.component').then(m => m.ClinicsComponent),
             },
             {
+              path: 'appointments',
+              title: 'Appointments',
+              loadComponent: () =>
+                import('./appointments/components/appointments.component').then(m => m.AppointmentsComponent),
+            },
+            {
               path: 'diagnoses',
               title: 'Diagnoses',
               loadComponent: () => import('./diagnoses/components/diagnoses.component').then(m => m.DiagnosesComponent),

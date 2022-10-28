@@ -204,7 +204,7 @@
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['id_card'].errors
           }"
           class="p-inputtext-sm w-full" />
-        <small *ngIf="isSubmitted && patientForm.controls['id_card'].errors" id="id_card" class="p-error block mt-1">
+        <small *ngIf="isSubmitted && patientForm.controls['id_card'].errors" class="p-error block mt-1">
           ID Card is required!
         </small>
       </div>
@@ -221,7 +221,7 @@
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['age'].errors
           }"
           class="p-inputtext-sm w-full" />
-        <small *ngIf="isSubmitted && patientForm.controls['age'].errors" id="age" class="p-error block mt-1">
+        <small *ngIf="isSubmitted && patientForm.controls['age'].errors" class="p-error block mt-1">
           Age is required!
         </small>
       </div>
@@ -239,7 +239,7 @@
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['gender'].errors
           }"
           class="w-full"></p-dropdown>
-        <small *ngIf="isSubmitted && patientForm.controls['gender'].errors" id="gender" class="p-error block mt-1">
+        <small *ngIf="isSubmitted && patientForm.controls['gender'].errors" class="p-error block mt-1">
           Gender is required!
         </small>
       </div>
@@ -257,10 +257,7 @@
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['blood_type'].errors
           }"
           class="w-full"></p-dropdown>
-        <small
-          *ngIf="isSubmitted && patientForm.controls['blood_type'].errors"
-          id="blood_type"
-          class="p-error block mt-1">
+        <small *ngIf="isSubmitted && patientForm.controls['blood_type'].errors" class="p-error block mt-1">
           Blood Type is required!
         </small>
       </div>
@@ -276,7 +273,7 @@
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['bod'].errors
           }"
           class="p-calendar-sm w-full"></p-calendar>
-        <small *ngIf="isSubmitted && patientForm.controls['bod'].errors" id="bod" class="p-error block mt-1">
+        <small *ngIf="isSubmitted && patientForm.controls['bod'].errors" class="p-error block mt-1">
           Date of Birth is required!
         </small>
       </div>
@@ -293,10 +290,7 @@
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['phone_number'].errors
           }"
           class="p-inputtext-sm w-full" />
-        <small
-          *ngIf="isSubmitted && patientForm.controls['phone_number'].errors"
-          id="phone_number"
-          class="p-error block mt-1">
+        <small *ngIf="isSubmitted && patientForm.controls['phone_number'].errors" class="p-error block mt-1">
           Phone is required!
         </small>
       </div>
@@ -315,7 +309,7 @@
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['address'].errors
           }"
           class="p-inputtext-sm w-full"></textarea>
-        <small *ngIf="isSubmitted && patientForm.controls['address'].errors" id="address" class="p-error block">
+        <small *ngIf="isSubmitted && patientForm.controls['address'].errors" class="p-error block">
           Address is required!
         </small>
       </div>
@@ -332,7 +326,7 @@
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['city'].errors
           }"
           class="p-inputtext-sm w-full" />
-        <small *ngIf="isSubmitted && patientForm.controls['city'].errors" id="city" class="p-error block mt-1">
+        <small *ngIf="isSubmitted && patientForm.controls['city'].errors" class="p-error block mt-1">
           City is required!
         </small>
       </div>
@@ -349,10 +343,7 @@
             'ng-invalid ng-dirty': isSubmitted && patientForm.controls['postal_code'].errors
           }"
           class="p-inputtext-sm w-full" />
-        <small
-          *ngIf="isSubmitted && patientForm.controls['postal_code'].errors"
-          id="postal_code"
-          class="p-error block mt-1">
+        <small *ngIf="isSubmitted && patientForm.controls['postal_code'].errors" class="p-error block mt-1">
           Postal Code is required!
         </small>
       </div>

@@ -12,18 +12,18 @@ import { ButtonModule } from 'primeng/button';
 import { PaginatorModule } from 'primeng/paginator';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CalendarModule } from 'primeng/calendar';
 
-import { IAccountRequestDTO, IAccountResponseDTO } from '../dtos/IAccountsDTO';
-import { AccountsService } from '../services/accounts.service';
-import { accountFields } from '../models/accounts';
-import { Roles } from '../models/role';
+import { AppointmentsService } from '../services/appointments.service';
+import { IAppointmentRequestDTO, IAppointmentResponseDTO } from '../dtos/IAppointmentsDTO';
+import { appointmentFields } from '../models/appointments';
 
 @Component({
-  selector: 'app-accounts',
-  templateUrl: './accounts.component.html',
-  styleUrls: ['./accounts.component.scss'],
+  selector: 'app-appointments',
+  templateUrl: './appointments.component.html',
+  styleUrls: ['./appointments.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -36,23 +36,24 @@ import { Roles } from '../models/role';
     DialogModule,
     ReactiveFormsModule,
     InputTextModule,
+    InputNumberModule,
     InputTextareaModule,
     CalendarModule,
   ],
-  providers: [MessageService, ConfirmationService, AccountsService],
+  providers: [MessageService, ConfirmationService, AppointmentsService],
 })
-export class AccountsComponent implements OnInit {
+export class AppointmentsComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
-  accountForm: FormGroup = new FormGroup({});
-  isAccountFormVisible: boolean = false;
-  accounts: IAccountResponseDTO[] = [];
-  selectedAccountId: number | undefined;
+  appointmentForm: FormGroup = new FormGroup({});
+  isAppointmentFormVisible: boolean = false;
+  appointments: IAppointmentResponseDTO[] = [];
+  clinicList: any[] = [];
+  selectedAppointmentId: number | undefined;
   isSubmitted: boolean = false;
   isSubmitLoading: boolean = false;
-  isAccountListLoading: boolean = false;
-  isAccountDetailLoading: boolean = false;
+  isAppointmentListLoading: boolean = false;
+  isAppointmentDetailLoading: boolean = false;
   isDeleteLoading: boolean = false;
-  roles: Roles[] = [];
 
   currentPage: number = 1;
   perPage: number = 5;
@@ -64,11 +65,11 @@ export class AccountsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private accountsService: AccountsService
+    private appointmentsService: AppointmentsService
   ) {}
 
   ngOnInit(): void {
-    accountFields.forEach(field => {
+    appointmentFields.forEach(field => {
       const formControl: FormControl = new FormControl('');
       if (field.isRequired) {
         formControl.addValidators(Validators.required);
@@ -76,35 +77,34 @@ export class AccountsComponent implements OnInit {
       if (field.regexPattern) {
         formControl.addValidators(Validators.pattern(field.regexPattern));
       }
-      this.accountForm.addControl(field.key, formControl);
+      this.appointmentForm.addControl(field.key, formControl);
     });
 
     let queryParams = {};
     this.activatedRoute.queryParams.subscribe(params => {
       queryParams = params;
     });
-    this.onGetAccounts(queryParams);
-    this.roles = Object.values(Roles);
+    this.onGetAppointments(queryParams);
   }
 
-  onGetAccounts(params?: { [key: string]: string | number }): void {
+  onGetAppointments(params?: { [key: string]: string | number }): void {
     const queryParams = {
       page: params ? params['page'] : this.currentPage,
       size: params ? params['per_page'] : this.perPage,
     };
-    this.isAccountListLoading = true;
-    this.accountsService
+    this.isAppointmentListLoading = true;
+    this.appointmentsService
       .get(queryParams)
       .pipe(takeUntil(this.ngUnsubsribe))
       .subscribe({
         next: res => {
-          this.accounts = res.data;
+          this.appointments = res.data;
           this.totalData = res.meta?.total_data as number;
-          this.isAccountListLoading = false;
+          this.isAppointmentListLoading = false;
         },
         error: error => {
           console.error(error);
-          this.isAccountListLoading = false;
+          this.isAppointmentListLoading = false;
         },
       });
   }
@@ -112,42 +112,40 @@ export class AccountsComponent implements OnInit {
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
     this.currentPage = pagination.page + 1;
     this.perPage = pagination.rows;
-    let queryParams: { page: number; per_page: number; sort?: string } = {
+    let queryParams: { page: number; per_page: number } = {
       page: pagination.page + 1,
       per_page: pagination.rows,
     };
-    this.router.navigate(['/dashboard/accounts'], { queryParams, replaceUrl: true });
-    this.onGetAccounts(queryParams);
+    this.router.navigate(['/dashboard/appointments'], { queryParams, replaceUrl: true });
+    this.onGetAppointments(queryParams);
   }
 
   onToggleForm(): void {
-    this.isAccountFormVisible = !this.isAccountFormVisible;
+    this.isAppointmentFormVisible = !this.isAppointmentFormVisible;
   }
 
   onHideForm(): void {
-    this.accountForm.reset();
+    this.appointmentForm.reset();
     this.isSubmitted = false;
   }
 
   onAddPreview(): void {
-    this.accountForm.setControl('password', new FormControl('', Validators.required));
-    this.selectedAccountId = undefined;
+    this.selectedAppointmentId = undefined;
     this.onToggleForm();
-    this.accountForm.reset();
+    this.appointmentForm.reset();
   }
 
-  onEditPreview(account: IAccountResponseDTO): void {
-    this.accountForm.setControl('password', new FormControl(''));
-    this.selectedAccountId = account.id;
-    this.accountForm.patchValue(account);
+  onEditPreview(appointment: IAppointmentResponseDTO): void {
+    this.selectedAppointmentId = appointment.id;
+    this.appointmentForm.patchValue(appointment);
     this.onToggleForm();
   }
 
   onDeletePreview(id: number) {
-    this.selectedAccountId = id;
+    this.selectedAppointmentId = id;
     this.confirmationService.confirm({
-      header: 'Delete Account',
-      message: 'Do you want to delete this patient? Account will deleted permanently, so be careful',
+      header: 'Delete Appointment',
+      message: 'Do you want to delete this appointment? Appointment will deleted permanently, so be careful',
       icon: 'pi pi-info-circle',
       defaultFocus: 'none',
       acceptIcon: '',
@@ -155,7 +153,7 @@ export class AccountsComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-outlined p-button-danger p-button-sm',
       accept: () => {
         this.isDeleteLoading = true;
-        this.accountsService
+        this.appointmentsService
           .delete(id)
           .pipe(takeUntil(this.ngUnsubsribe))
           .subscribe({
@@ -163,10 +161,10 @@ export class AccountsComponent implements OnInit {
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Account Deleted!',
+                detail: 'Appointment Deleted!',
               });
-              this.selectedAccountId = undefined;
-              this.onGetAccounts();
+              this.selectedAppointmentId = undefined;
+              this.onGetAppointments();
             },
             complete: () => {
               this.isDeleteLoading = false;
@@ -176,31 +174,33 @@ export class AccountsComponent implements OnInit {
       rejectLabel: 'Cancel',
       rejectButtonStyleClass: 'p-button-primary p-button-sm',
       reject: () => {
-        this.selectedAccountId = undefined;
+        this.selectedAppointmentId = undefined;
       },
     });
   }
 
   onSubmit() {
     this.isSubmitted = true;
-    if (this.accountForm.invalid) return;
+    if (this.appointmentForm.invalid) return;
     this.isSubmitLoading = true;
-    const payload: IAccountRequestDTO = this.accountForm.value;
-    const submitService = this.selectedAccountId
-      ? this.accountsService.update(this.selectedAccountId, payload)
-      : this.accountsService.create(payload);
+    const payload: IAppointmentRequestDTO = this.appointmentForm.value;
+    const appointmentDate = new Date(payload.appointment_date);
+    payload.appointment_date = formatDate(appointmentDate, 'yyyy-MM-dd HH:mm:dd', 'en-US');
+    const submitService = this.selectedAppointmentId
+      ? this.appointmentsService.update(this.selectedAppointmentId, payload)
+      : this.appointmentsService.create(payload);
     submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
       next: () => {
         this.isSubmitted = false;
         this.isSubmitLoading = false;
+        this.appointmentForm.reset();
         this.onToggleForm();
-        this.accountForm.reset();
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: this.selectedAccountId ? 'Account Updated!' : 'Account Created!',
+          detail: this.selectedAppointmentId ? 'Appointment Updated!' : 'Appointment Created!',
         });
-        this.onGetAccounts();
+        this.onGetAppointments();
       },
       error: error => {
         console.error(error);
