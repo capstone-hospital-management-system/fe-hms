@@ -1,4 +1,4 @@
-import { Roles } from "../models/role";
+import { Roles } from '../models/role';
 
 export interface IAccount {
   first_name: string;
