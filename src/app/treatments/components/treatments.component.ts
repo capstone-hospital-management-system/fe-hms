@@ -44,7 +44,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
     CalendarModule,
     RadioButtonModule,
   ],
-  providers: [MessageService, ConfirmationService, TreatmentsService, DiagnosesService, FormBuilder],
+  providers: [MessageService, ConfirmationService, TreatmentsService, DiagnosesService],
 })
 export class TreatmentsComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
@@ -71,27 +71,20 @@ export class TreatmentsComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private treatmentsService: TreatmentsService,
-    private diagnosesService: DiagnosesService,
-    private formBuilder: FormBuilder
-  ) {
-    this.treatmentForm = this.formBuilder.group({
-      diagnose_id: ['', Validators.required],
-      status: ['', Validators.required],
-      report: ['', Validators.required],
-    });
-  }
+    private diagnosesService: DiagnosesService
+  ) {}
 
   ngOnInit(): void {
-    // treatmentFields.forEach(field => {
-    //   const formControl: FormControl = new FormControl('');
-    //   if (field.isRequired) {
-    //     formControl.addValidators(Validators.required);
-    //   }
-    //   if (field.regexPattern) {
-    //     formControl.addValidators(Validators.pattern(field.regexPattern));
-    //   }
-    //   this.treatmentForm.addControl(field.key, formControl);
-    // });
+    treatmentFields.forEach(field => {
+      const formControl: FormControl = new FormControl('');
+      if (field.isRequired) {
+        formControl.addValidators(Validators.required);
+      }
+      if (field.regexPattern) {
+        formControl.addValidators(Validators.pattern(field.regexPattern));
+      }
+      this.treatmentForm.addControl(field.key, formControl);
+    });
 
     let queryParams = {};
     this.activatedRoute.queryParams.subscribe(params => {

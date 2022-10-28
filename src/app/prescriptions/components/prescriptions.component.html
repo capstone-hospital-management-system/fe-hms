@@ -50,13 +50,13 @@
           {{ prescription.id }}
         </td>
         <td class="text-sm">
-          {{ prescription.diagnose_id }}
+          {{ prescription.diagnose.name }}
         </td>
         <td class="text-sm">
           {{ prescription.description }}
         </td>
         <td class="text-sm">
-          {{ prescription.others }}
+          {{ prescription.others ?? '-' }}
         </td>
         <td class="text-sm">
           <span
@@ -121,6 +121,7 @@
             <p class="text-sm mb-2">Diagnose</p>
             <p-dropdown
               formControlName="diagnose_id"
+              appendTo="body"
               inputId="diagnose_id"
               optionLabel="name"
               optionValue="id"
@@ -132,7 +133,8 @@
               [showClear]="true"
               [ngClass]="{
                 'ng-invalid ng-dirty': isSubmitted && prescriptionForm.controls['diagnose_id'].errors
-              }"></p-dropdown>
+              }">
+            </p-dropdown>
             <small *ngIf="isSubmitted && prescriptionForm.controls['diagnose_id'].errors" class="p-error block mt-1">
               Diagnose is required!
             </small>
@@ -222,6 +224,7 @@
             class="flex align-middle mt-2">
             <p-dropdown
               [formControlName]="medicineFieldIndex"
+              appendTo="body"
               [inputId]="'medicine-' + medicineFieldIndex"
               optionLabel="name"
               optionValue="id"
@@ -247,7 +250,7 @@
             class="p-button-success p-button-sm w-full py-2 px-10 mt-3"
             (click)="onAddMedicine()"></button>
           <small *ngIf="isSubmitted && prescriptionForm.controls['medicine_ids'].errors" class="p-error block mt-2">
-            Medicines is required!
+            Medicines are required!
           </small>
         </div>
       </div>

@@ -206,8 +206,9 @@
       <div class="field">
         <p class="text-sm mb-2">Role</p>
         <p-dropdown
-          [options]="roles"
           formControlName="role"
+          appendTo="body"
+          [options]="roles"
           id="role"
           type="select"
           placeholder="Role"

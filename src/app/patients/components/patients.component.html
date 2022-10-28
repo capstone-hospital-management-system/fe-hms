@@ -229,8 +229,9 @@
       <div class="field">
         <p class="text-sm mb-2">Gender</p>
         <p-dropdown
-          [options]="genders"
           formControlName="gender"
+          appendTo="body"
+          [options]="genders"
           id="gender"
           type="select"
           placeholder="Gender"
@@ -247,8 +248,9 @@
       <div class="field">
         <p class="text-sm mb-2">Blood Type</p>
         <p-dropdown
-          [options]="bloodTypes"
           formControlName="blood_type"
+          appendTo="body"
+          [options]="bloodTypes"
           id="blood_type"
           type="select"
           placeholder="Blood Type"

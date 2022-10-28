@@ -18,10 +18,13 @@ import { CalendarModule } from 'primeng/calendar';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { DropdownModule } from 'primeng/dropdown';
 
+import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
+import { DiagnosesService } from 'src/app/diagnoses/services/diagnoses.service';
+import { IDiagnoseResponseDTO } from 'src/app/diagnoses/dtos/IDiagnosesDTO';
+import { MedicinesService } from 'src/app/medicines/services/medicines.service';
 import { PrescriptionsService } from '../services/prescriptions.service';
 import { IPrescriptionRequestDTO, IPrescriptionResponseDTO } from '../dtos/IPrescriptionsDTO';
 import { prescriptionFields } from '../models/prescriptions';
-import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
 
 @Component({
   selector: 'app-prescriptions',
@@ -45,14 +48,14 @@ import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
     RadioButtonModule,
     DropdownModule,
   ],
-  providers: [MessageService, ConfirmationService, PrescriptionsService],
+  providers: [MessageService, ConfirmationService, PrescriptionsService, DiagnosesService, MedicinesService],
 })
 export class PrescriptionsComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
   prescriptionForm: FormGroup = new FormGroup({});
   isPrescriptionFormVisible: boolean = false;
   prescriptions: IPrescriptionResponseDTO[] = [];
-  diagnoseList: any[] = [];
+  diagnoseList: IDiagnoseResponseDTO[] = [];
   medicineList: IMedicineResponseDTO[] = [];
   selectedPrescriptionId: number | undefined;
   isSubmitted: boolean = false;
@@ -71,7 +74,9 @@ export class PrescriptionsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private prescriptionsService: PrescriptionsService
+    private prescriptionsService: PrescriptionsService,
+    private diagnosesService: DiagnosesService,
+    private medicinesService: MedicinesService
   ) {}
 
   ngOnInit(): void {
@@ -96,6 +101,8 @@ export class PrescriptionsComponent implements OnInit {
       queryParams = params;
     });
     this.onGetPrescriptions(queryParams);
+    this.onGetDiagnoses();
+    this.onGetMedicines();
   }
 
   onGetPrescriptions(params?: { [key: string]: string | number }): void {
@@ -121,6 +128,50 @@ export class PrescriptionsComponent implements OnInit {
             detail: error,
           });
           this.isPrescriptionListLoading = false;
+        },
+      });
+  }
+
+  onGetDiagnoses(params?: { [key: string]: string | number }): void {
+    const queryParams = {
+      search: params ? params['search'] : '',
+    };
+    this.diagnosesService
+      .get(queryParams)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.diagnoseList = res.data;
+        },
+        error: error => {
+          console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
+        },
+      });
+  }
+
+  onGetMedicines(params?: { [key: string]: string | number }): void {
+    const queryParams = {
+      search: params ? params['search'] : '',
+    };
+    this.medicinesService
+      .get(queryParams)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.medicineList = res.data;
+        },
+        error: error => {
+          console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
         },
       });
   }
@@ -154,6 +205,7 @@ export class PrescriptionsComponent implements OnInit {
 
   onHideForm(): void {
     this.prescriptionForm.reset();
+    this.medicineIds.clear();
     this.isSubmitted = false;
   }
 
@@ -165,7 +217,16 @@ export class PrescriptionsComponent implements OnInit {
 
   onEditPreview(prescription: IPrescriptionResponseDTO): void {
     this.selectedPrescriptionId = prescription.id;
-    this.prescriptionForm.patchValue(prescription);
+    this.prescriptionForm.patchValue({
+      diagnose_id: prescription.diagnose.id,
+      status: prescription.status,
+      description: prescription.description,
+      medicine_ids: prescription.medicines.map(medicine => medicine.id),
+      others: prescription.others,
+    });
+    prescription.medicines.forEach(prescription => {
+      this.medicineIds.push(new FormControl(prescription.id, Validators.required));
+    });
     this.onToggleForm();
   }
 
