@@ -105,6 +105,11 @@ export class AccountsComponent implements OnInit {
         error: error => {
           console.error(error);
           this.isAccountListLoading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
         },
       });
   }
@@ -204,6 +209,11 @@ export class AccountsComponent implements OnInit {
       },
       error: error => {
         console.error(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed!',
+          detail: error,
+        });
         this.isSubmitLoading = false;
       },
     });

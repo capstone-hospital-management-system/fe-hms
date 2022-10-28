@@ -109,31 +109,14 @@ export class BillsComponent implements OnInit {
         },
         error: error => {
           console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
           this.isBillListLoading = false;
         },
       });
-
-    // Hanya untuk testing
-    this.bills = [
-      {
-        id: 1,
-        prescription_id: 1,
-        total_price: 250000,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ];
-    this.prescriptionList = [
-      {
-        id: 1,
-        diagnose_id: 1,
-        description: 'Deskripsi Prescription',
-        others: '',
-        status: 'WAITING_PAYMENT',
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ];
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
@@ -229,6 +212,11 @@ export class BillsComponent implements OnInit {
       },
       error: error => {
         console.error(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed!',
+          detail: error,
+        });
         this.isSubmitLoading = false;
       },
     });

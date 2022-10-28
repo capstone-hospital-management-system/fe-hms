@@ -115,6 +115,11 @@ export class PrescriptionsComponent implements OnInit {
         },
         error: error => {
           console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
           this.isPrescriptionListLoading = false;
         },
       });
@@ -226,6 +231,11 @@ export class PrescriptionsComponent implements OnInit {
       },
       error: error => {
         console.error(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed!',
+          detail: error,
+        });
         this.isSubmitLoading = false;
       },
     });

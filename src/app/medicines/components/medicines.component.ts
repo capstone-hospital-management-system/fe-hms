@@ -103,6 +103,11 @@ export class MedicinesComponent implements OnInit {
         },
         error: error => {
           console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
           this.isMedicineListLoading = false;
         },
       });
@@ -201,6 +206,11 @@ export class MedicinesComponent implements OnInit {
       },
       error: error => {
         console.error(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed!',
+          detail: error,
+        });
         this.isSubmitLoading = false;
       },
     });

@@ -104,6 +104,11 @@ export class TreatmentsComponent implements OnInit {
         },
         error: error => {
           console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
           this.isTreatmentListLoading = false;
         },
       });
@@ -203,6 +208,11 @@ export class TreatmentsComponent implements OnInit {
       },
       error: error => {
         console.error(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed!',
+          detail: error,
+        });
         this.isSubmitLoading = false;
       },
     });
