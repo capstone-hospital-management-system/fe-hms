@@ -1,18 +1,23 @@
 import { IField } from 'src/app/core/dtos/IFields';
 
-export const treatmentFields: IField[] = [
+export const appointmentFields: IField[] = [
   {
-    key: 'diagnose_id',
+    key: 'clinic_id',
     isRequired: true,
     regexPattern: '',
   },
   {
-    key: 'status',
+    key: 'appointment_date',
     isRequired: true,
     regexPattern: '',
   },
   {
-    key: 'report',
+    key: 'patient_id',
+    isRequired: true,
+    regexPattern: '',
+  },
+  {
+    key: 'doctor_id',
     isRequired: true,
     regexPattern: '',
   },
