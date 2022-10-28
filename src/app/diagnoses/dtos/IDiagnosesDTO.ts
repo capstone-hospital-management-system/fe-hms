@@ -1,5 +1,7 @@
+import { IAppointmentResponseDTO } from 'src/app/appointments/dtos/IAppointmentsDTO';
+
 export interface IDiagnose {
-  appointment_id: number;
+  appointment: IAppointmentResponseDTO;
   name: string;
   description: string;
   report: string;

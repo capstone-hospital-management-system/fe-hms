@@ -53,7 +53,7 @@
           {{ diagnose.name }}
         </td>
         <td class="text-sm">
-          {{ diagnose.appointment_id }}
+          {{ diagnose.appointment.appointment_date | date: 'dd-MM-yyyy HH:mm:ss' }}
         </td>
         <td class="text-sm">
           {{ diagnose.description }}
@@ -107,7 +107,6 @@
           <p-dropdown
             formControlName="appointment_id"
             inputId="appointment_id"
-            optionLabel="name"
             optionValue="id"
             filterBy="name"
             placeholder="Select Appointment"
@@ -117,7 +116,20 @@
             [showClear]="true"
             [ngClass]="{
               'ng-invalid ng-dirty': isSubmitted && diagnoseForm.controls['appointment_id'].errors
-            }"></p-dropdown>
+            }"
+            (onChange)="onAppointmentChange($event)">
+            <ng-template pTemplate="selectedItem">
+              <p *ngIf="selectedAppointment" class="text-sm">
+                {{ selectedAppointment.id }} - {{ selectedAppointment.clinic.name }} -
+                {{ selectedAppointment.patient.username }}
+              </p>
+            </ng-template>
+            <ng-template let-appointment pTemplate="item">
+              <p class="text-sm">
+                {{ appointment.id }} - {{ appointment.clinic.name }} - {{ appointment.patient.username }}
+              </p>
+            </ng-template>
+          </p-dropdown>
           <small *ngIf="isSubmitted && diagnoseForm.controls['appointment_id'].errors" class="p-error block mt-1">
             Appointment is required!
           </small>
