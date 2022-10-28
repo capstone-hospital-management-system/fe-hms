@@ -46,18 +46,18 @@
           {{ bill.id }}
         </td>
         <td class="text-sm">
-          {{ bill.prescription_id }}
+          {{ bill.prescription.description }}
         </td>
         <td class="text-sm">
           {{ bill.total_price | currency: 'IDR' }}
         </td>
         <td>
-          <button
+          <!-- <button
             pButton
             icon="pi pi-download"
             class="p-button-primary p-button-sm mr-2"
             [loading]="bill.id === selectedBillId && isBillDetailLoading"
-            (click)="onEditPreview(bill)"></button>
+            (click)="onEditPreview(bill)"></button> -->
           <button
             pButton
             icon="pi pi-pencil"
@@ -114,7 +114,13 @@
             [showClear]="true"
             [ngClass]="{
               'ng-invalid ng-dirty': isSubmitted && billForm.controls['prescription_id'].errors
-            }">
+            }"
+            (onChange)="onPrescriptionChange($event)">
+            <ng-template pTemplate="selectedItem">
+              <div *ngIf="selectedPrescription">
+                {{ selectedPrescription.description }}
+              </div>
+            </ng-template>
             <ng-template let-prescription pTemplate="item">
               <div>{{ prescription.description }}</div>
             </ng-template>

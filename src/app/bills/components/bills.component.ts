@@ -18,10 +18,11 @@ import { CalendarModule } from 'primeng/calendar';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { DropdownModule } from 'primeng/dropdown';
 
+import { IPrescriptionResponseDTO } from 'src/app/prescriptions/dtos/IPrescriptionsDTO';
+import { PrescriptionsService } from 'src/app/prescriptions/services/prescriptions.service';
 import { BillsService } from '../services/bills.service';
 import { IBillRequestDTO, IBillResponseDTO } from '../dtos/IBillsDTO';
 import { billFields } from '../models/bills';
-import { IPrescriptionResponseDTO } from 'src/app/prescriptions/dtos/IPrescriptionsDTO';
 
 @Component({
   selector: 'app-bills',
@@ -45,7 +46,7 @@ import { IPrescriptionResponseDTO } from 'src/app/prescriptions/dtos/IPrescripti
     RadioButtonModule,
     DropdownModule,
   ],
-  providers: [MessageService, ConfirmationService, BillsService],
+  providers: [MessageService, ConfirmationService, BillsService, PrescriptionsService],
 })
 export class BillsComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
@@ -53,6 +54,7 @@ export class BillsComponent implements OnInit {
   isBillFormVisible: boolean = false;
   bills: IBillResponseDTO[] = [];
   prescriptionList: IPrescriptionResponseDTO[] = [];
+  selectedPrescription: IPrescriptionResponseDTO | undefined = undefined;
   selectedBillId: number | undefined;
   isSubmitted: boolean = false;
   isSubmitLoading: boolean = false;
@@ -70,7 +72,8 @@ export class BillsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private billsService: BillsService
+    private billsService: BillsService,
+    private prescriptionsService: PrescriptionsService
   ) {}
 
   ngOnInit(): void {
@@ -84,12 +87,12 @@ export class BillsComponent implements OnInit {
       }
       this.billForm.addControl(field.key, formControl);
     });
-
     let queryParams = {};
     this.activatedRoute.queryParams.subscribe(params => {
       queryParams = params;
     });
     this.onGetBills(queryParams);
+    this.onGetPrescriptions();
   }
 
   onGetBills(params?: { [key: string]: string | number }): void {
@@ -117,6 +120,32 @@ export class BillsComponent implements OnInit {
           this.isBillListLoading = false;
         },
       });
+  }
+
+  onGetPrescriptions(params?: { [key: string]: string | number }): void {
+    const queryParams = {
+      search: params ? params['search'] : '',
+    };
+    this.prescriptionsService
+      .get(queryParams)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.prescriptionList = res.data;
+        },
+        error: error => {
+          console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
+        },
+      });
+  }
+
+  onPrescriptionChange(event: any): void {
+    this.selectedPrescription = this.prescriptionList.find(prescription => prescription.id === event.value);
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
@@ -147,7 +176,11 @@ export class BillsComponent implements OnInit {
 
   onEditPreview(bill: IBillResponseDTO): void {
     this.selectedBillId = bill.id;
-    this.billForm.patchValue(bill);
+    this.selectedPrescription = bill.prescription;
+    this.billForm.patchValue({
+      prescription_id: bill.prescription.id,
+      total_price: bill.total_price,
+    });
     this.onToggleForm();
   }
 
