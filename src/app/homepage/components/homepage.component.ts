@@ -1,20 +1,58 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
-import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'app-homepage',
   templateUrl: './homepage.component.html',
   styleUrls: ['./homepage.component.scss'],
   standalone: true,
-  imports: [ToastModule, ButtonModule],
-  providers: [MessageService],
+  imports: [CommonModule, CardModule],
+  providers: [],
 })
 export class HomepageComponent {
-  constructor(private messageService: MessageService) {}
+  statistics: any[] = [
+    {
+      icon: 'pi pi-verified',
+      label: 'Available Staff',
+      count: 12345,
+    },
+    {
+      icon: 'pi pi-users',
+      label: 'Patients',
+      count: 12345,
+    },
+    {
+      icon: 'pi pi-building',
+      label: 'Clinics',
+      count: 12345,
+    },
+    {
+      icon: 'pi pi-flag-fill',
+      label: 'Diagnoses',
+      count: 12345,
+    },
+    {
+      icon: 'pi pi-flag',
+      label: 'Treatments',
+      count: 12345,
+    },
+    {
+      icon: 'pi pi-tags',
+      label: 'Medicines',
+      count: 12345,
+    },
+    {
+      icon: 'pi pi-book',
+      label: 'Prescriptions',
+      count: 12345,
+    },
+    {
+      icon: 'pi pi-copy',
+      label: 'Total Bills',
+      count: 12345,
+    },
+  ];
 
-  onShowToast(): void {
-    this.messageService.add({ severity: 'success', summary: 'Homepage is in the air!!!', detail: '', life: 5000 });
-  }
+  constructor() {}
 }
