@@ -1,8 +1,12 @@
+import { IPatientResponseDTO } from './../../patients/dtos/IPatientsDTO';
+import { IClinicResponseDTO } from 'src/app/clinics/dtos/IClinicsDTO';
+import { IAccountResponseDTO } from 'src/app/auth/dtos/IAuth';
+
 export interface IAppointment {
-  clinic_id: string;
+  clinic: IClinicResponseDTO;
   appointment_date: string;
-  patient_id: number;
-  doctor_id: number;
+  patient: IPatientResponseDTO;
+  doctor: IAccountResponseDTO;
 }
 
 export interface IAppointmentResponseDTO extends IAppointment {
@@ -11,4 +15,7 @@ export interface IAppointmentResponseDTO extends IAppointment {
   updated_at: number | Date;
 }
 
-export interface IAppointmentRequestDTO extends IAppointment {}
+export interface IAppointmentRequestDTO extends IAppointment {
+  created_by: number;
+  updated_by: number;
+}

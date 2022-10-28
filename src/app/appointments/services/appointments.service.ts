@@ -10,7 +10,7 @@ import { IAppointmentRequestDTO, IAppointmentResponseDTO } from '../dtos/IAppoin
   providedIn: 'root',
 })
 export class AppointmentsService {
-  private url: string = `${environment.baseUrl}/medicines`;
+  private url: string = `${environment.baseUrl}/appointments`;
 
   constructor(private http: HttpClient) {}
 
