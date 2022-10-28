@@ -1,5 +1,7 @@
+import { IPrescriptionResponseDTO } from 'src/app/prescriptions/dtos/IPrescriptionsDTO';
+
 export interface IBill {
-  prescription_id: number;
+  prescription: IPrescriptionResponseDTO;
   total_price: number;
 }
 

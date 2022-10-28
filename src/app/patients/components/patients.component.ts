@@ -107,6 +107,11 @@ export class PatientsComponent implements OnInit {
         },
         error: error => {
           console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
           this.isPatientListLoading = false;
         },
       });
@@ -210,6 +215,11 @@ export class PatientsComponent implements OnInit {
       },
       error: error => {
         console.error(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed!',
+          detail: error,
+        });
         this.isSubmitLoading = false;
       },
     });

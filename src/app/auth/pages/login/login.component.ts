@@ -55,8 +55,8 @@ export class LoginComponent implements OnInit {
   onShowErrorLogin(): void {
     this.messageService.add({
       severity: 'error',
-      summary: 'Failed Login!',
-      detail: 'Invalid Credential, try again!',
+      summary: 'Failed!',
+      detail: 'Invalid Credential!',
     });
   }
 
@@ -88,6 +88,8 @@ export class LoginComponent implements OnInit {
           }, 1000);
         },
         error: () => {
+          this.isSubmitted = false;
+          this.isLoading = false;
           this.onShowErrorLogin();
         },
       });

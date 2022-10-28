@@ -19,9 +19,11 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { DropdownModule } from 'primeng/dropdown';
 
 import { DiagnosesService } from '../services/diagnoses.service';
+import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
+import { AppointmentsService } from 'src/app/appointments/services/appointments.service';
+import { IAppointmentResponseDTO } from 'src/app/appointments/dtos/IAppointmentsDTO';
 import { IDiagnoseRequestDTO, IDiagnoseResponseDTO } from '../dtos/IDiagnosesDTO';
 import { diagnoseFields } from '../models/diagnoses';
-import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
 
 @Component({
   selector: 'app-diagnoses',
@@ -45,14 +47,15 @@ import { IMedicineResponseDTO } from 'src/app/medicines/dtos/IMedicinesDTO';
     RadioButtonModule,
     DropdownModule,
   ],
-  providers: [MessageService, ConfirmationService, DiagnosesService],
+  providers: [MessageService, ConfirmationService, DiagnosesService, AppointmentsService],
 })
 export class DiagnosesComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
   diagnoseForm: FormGroup = new FormGroup({});
   isDiagnoseFormVisible: boolean = false;
   diagnoses: IDiagnoseResponseDTO[] = [];
-  appointmentList: any[] = [];
+  appointmentList: IAppointmentResponseDTO[] = [];
+  selectedAppointment: IAppointmentResponseDTO | undefined = undefined;
   medicineList: IMedicineResponseDTO[] = [];
   selectedDiagnoseId: number | undefined;
   isSubmitted: boolean = false;
@@ -71,7 +74,8 @@ export class DiagnosesComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private diagnosesService: DiagnosesService
+    private diagnosesService: DiagnosesService,
+    private appointmentsService: AppointmentsService
   ) {}
 
   ngOnInit(): void {
@@ -96,6 +100,7 @@ export class DiagnosesComponent implements OnInit {
       queryParams = params;
     });
     this.onGetDiagnoses(queryParams);
+    this.onGetAppointments();
   }
 
   onGetDiagnoses(params?: { [key: string]: string | number }): void {
@@ -115,9 +120,41 @@ export class DiagnosesComponent implements OnInit {
         },
         error: error => {
           console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
           this.isDiagnoseListLoading = false;
         },
       });
+  }
+
+  onGetAppointments(params?: { [key: string]: string | number }): void {
+    const queryParams = {
+      search: params ? params['search'] : '',
+    };
+    this.appointmentsService
+      .get(queryParams)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.appointmentList = res.data;
+        },
+        error: error => {
+          console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
+        },
+      });
+  }
+
+  onAppointmentChange(event: any): void {
+    const findAppointment = this.appointmentList.find(appointment => appointment.id === event.value);
+    this.selectedAppointment = findAppointment;
   }
 
   get medicineIds() {
@@ -160,7 +197,13 @@ export class DiagnosesComponent implements OnInit {
 
   onEditPreview(diagnose: IDiagnoseResponseDTO): void {
     this.selectedDiagnoseId = diagnose.id;
-    this.diagnoseForm.patchValue(diagnose);
+    this.selectedAppointment = diagnose.appointment;
+    this.diagnoseForm.patchValue({
+      name: diagnose.name,
+      appointment_id: diagnose.appointment.id,
+      description: diagnose.description,
+      report: diagnose.report,
+    });
     this.onToggleForm();
   }
 
@@ -204,8 +247,8 @@ export class DiagnosesComponent implements OnInit {
 
   onSubmit() {
     this.isSubmitted = true;
+    if (!this.selectedDiagnoseId) this.diagnoseForm.patchValue({ status: 'WAITING_PAYMENT' });
     if (this.diagnoseForm.invalid) return;
-    this.diagnoseForm.patchValue({ status: 'WAITING_PAYMENT' });
     this.isSubmitLoading = true;
     const payload: IDiagnoseRequestDTO = this.diagnoseForm.value;
     const submitService = this.selectedDiagnoseId
@@ -226,6 +269,11 @@ export class DiagnosesComponent implements OnInit {
       },
       error: error => {
         console.error(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed!',
+          detail: error,
+        });
         this.isSubmitLoading = false;
       },
     });

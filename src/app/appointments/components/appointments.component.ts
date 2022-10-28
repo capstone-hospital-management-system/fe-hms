@@ -16,6 +16,13 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CalendarModule } from 'primeng/calendar';
 
+import { IClinicResponseDTO } from 'src/app/clinics/dtos/IClinicsDTO';
+import { ClinicsService } from 'src/app/clinics/services/clinics.service';
+import { IAccountResponseDTO } from 'src/app/accounts/dtos/IAccountsDTO';
+import { AccountsService } from 'src/app/accounts/services/accounts.service';
+import { PatientsService } from 'src/app/patients/services/patients.service';
+import { IPatientResponseDTO } from 'src/app/patients/dtos/IPatientsDTO';
+import { SessionService } from 'src/app/auth/services/session/session.service';
 import { AppointmentsService } from '../services/appointments.service';
 import { IAppointmentRequestDTO, IAppointmentResponseDTO } from '../dtos/IAppointmentsDTO';
 import { appointmentFields } from '../models/appointments';
@@ -40,14 +47,24 @@ import { appointmentFields } from '../models/appointments';
     InputTextareaModule,
     CalendarModule,
   ],
-  providers: [MessageService, ConfirmationService, AppointmentsService],
+  providers: [
+    MessageService,
+    ConfirmationService,
+    AppointmentsService,
+    ClinicsService,
+    PatientsService,
+    AccountsService,
+    SessionService,
+  ],
 })
 export class AppointmentsComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
   appointmentForm: FormGroup = new FormGroup({});
   isAppointmentFormVisible: boolean = false;
   appointments: IAppointmentResponseDTO[] = [];
-  clinicList: any[] = [];
+  clinicList: IClinicResponseDTO[] = [];
+  patientList: IPatientResponseDTO[] = [];
+  accountList: IAccountResponseDTO[] = [];
   selectedAppointmentId: number | undefined;
   isSubmitted: boolean = false;
   isSubmitLoading: boolean = false;
@@ -65,7 +82,11 @@ export class AppointmentsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private appointmentsService: AppointmentsService
+    private appointmentsService: AppointmentsService,
+    private clinicsService: ClinicsService,
+    private patientsService: PatientsService,
+    private accountsService: AccountsService,
+    private sessionService: SessionService
   ) {}
 
   ngOnInit(): void {
@@ -85,6 +106,9 @@ export class AppointmentsComponent implements OnInit {
       queryParams = params;
     });
     this.onGetAppointments(queryParams);
+    this.onGetClinics();
+    this.onGetPatients();
+    this.onGetAccounts();
   }
 
   onGetAppointments(params?: { [key: string]: string | number }): void {
@@ -104,7 +128,78 @@ export class AppointmentsComponent implements OnInit {
         },
         error: error => {
           console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
           this.isAppointmentListLoading = false;
+        },
+      });
+  }
+
+  onGetClinics(params?: { [key: string]: string | number }): void {
+    const queryParams = {
+      search: params ? params['search'] : '',
+    };
+    this.clinicsService
+      .get(queryParams)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.clinicList = res.data;
+        },
+        error: error => {
+          console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
+        },
+      });
+  }
+
+  onGetPatients(params?: { [key: string]: string | number }): void {
+    const queryParams = {
+      search: params ? params['search'] : '',
+    };
+    this.patientsService
+      .get(queryParams)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.patientList = res.data;
+        },
+        error: error => {
+          console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
+        },
+      });
+  }
+
+  onGetAccounts(params?: { [key: string]: string | number }): void {
+    const queryParams = {
+      search: params ? params['search'] : '',
+    };
+    this.accountsService
+      .get(queryParams)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.accountList = res.data;
+        },
+        error: error => {
+          console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
         },
       });
   }
@@ -137,7 +232,12 @@ export class AppointmentsComponent implements OnInit {
 
   onEditPreview(appointment: IAppointmentResponseDTO): void {
     this.selectedAppointmentId = appointment.id;
-    this.appointmentForm.patchValue(appointment);
+    this.appointmentForm.patchValue({
+      clinic_id: appointment.clinic.id,
+      appointment_date: new Date(appointment.appointment_date),
+      patient_id: appointment.patient.id,
+      doctor_id: appointment.doctor.id,
+    });
     this.onToggleForm();
   }
 
@@ -183,9 +283,15 @@ export class AppointmentsComponent implements OnInit {
     this.isSubmitted = true;
     if (this.appointmentForm.invalid) return;
     this.isSubmitLoading = true;
+
     const payload: IAppointmentRequestDTO = this.appointmentForm.value;
+
     const appointmentDate = new Date(payload.appointment_date);
     payload.appointment_date = formatDate(appointmentDate, 'yyyy-MM-dd HH:mm:dd', 'en-US');
+
+    payload.created_by = this.sessionService.getSession().id;
+    payload.updated_by = this.sessionService.getSession().id;
+
     const submitService = this.selectedAppointmentId
       ? this.appointmentsService.update(this.selectedAppointmentId, payload)
       : this.appointmentsService.create(payload);
@@ -204,6 +310,11 @@ export class AppointmentsComponent implements OnInit {
       },
       error: error => {
         console.error(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed!',
+          detail: error,
+        });
         this.isSubmitLoading = false;
       },
     });

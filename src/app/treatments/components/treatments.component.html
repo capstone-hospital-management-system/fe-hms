@@ -27,14 +27,16 @@
     <ng-template pTemplate="header">
       <tr>
         <th class="text-sm">ID</th>
-        <th class="text-sm">Name</th>
-        <th class="text-sm">Desciption</th>
+        <th class="text-sm">Diagnose</th>
+        <th class="text-sm">Report</th>
+        <th class="text-sm">Status</th>
         <th class="text-sm">Actions</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-treatment>
       <tr *ngIf="isTreatmentListLoading">
+        <td><p-skeleton></p-skeleton></td>
         <td><p-skeleton></p-skeleton></td>
         <td><p-skeleton></p-skeleton></td>
         <td><p-skeleton></p-skeleton></td>
@@ -46,10 +48,28 @@
           {{ treatment.id }}
         </td>
         <td class="text-sm">
-          {{ treatment.name }}
+          {{ treatment.diagnose.name }}
         </td>
         <td class="text-sm">
-          {{ treatment.description }}
+          {{ treatment.report }}
+        </td>
+        <td class="text-sm">
+          <span
+            *ngIf="treatment.status === 'WAITING'"
+            class="rounded-lg drop-shadow-md bg-blue-500 text-white py-2 px-4">
+            {{ treatment.status }}
+          </span>
+          <span *ngIf="treatment.status === 'DONE'" class="rounded-lg drop-shadow-md bg-green-500 text-white py-2 px-4">
+            {{ treatment.status }}
+          </span>
+          <span
+            *ngIf="treatment.status === 'IN PROGRESS'"
+            class="rounded-lg drop-shadow-md bg-yellow-500 text-white py-2 px-4">
+            {{ treatment.status }}
+          </span>
+          <span *ngIf="treatment.status === 'CANCEL'" class="rounded-lg drop-shadow-md bg-red-500 text-white py-2 px-4">
+            {{ treatment.status }}
+          </span>
         </td>
         <td>
           <button
@@ -95,6 +115,7 @@
         <p class="text-sm mb-2">Diagnose</p>
         <p-dropdown
           formControlName="diagnose_id"
+          appendTo="body"
           inputId="diagnose_id"
           optionLabel="name"
           optionValue="id"
@@ -106,7 +127,8 @@
           [showClear]="true"
           [ngClass]="{
             'ng-invalid ng-dirty': isSubmitted && treatmentForm.controls['diagnose_id'].errors
-          }"></p-dropdown>
+          }">
+        </p-dropdown>
         <small *ngIf="isSubmitted && treatmentForm.controls['diagnose_id'].errors" class="p-error block mt-1">
           Diagnose is required!
         </small>
@@ -116,43 +138,20 @@
         <p class="text-sm mb-2">Status</p>
         <div class="flex flex-wrap align-middle">
           <div class="flex items-center mr-2 mb-2">
-            <p-radioButton
-              formControlName="status"
-              id="status2"
-              name="status"
-              value="IN_PROGRESS"
-              class="mr-2"></p-radioButton>
-            <label for="status2" class="rounded-lg drop-shadow-md bg-yellow-600 text-white text-xs py-1 px-2">
-              IN_PROGRESS
-            </label>
+            <p-radioButton formControlName="status" value="WAITING" class="mr-2"></p-radioButton>
+            <label class="rounded-lg drop-shadow-md bg-blue-500 text-white text-xs py-1 px-2"> WAITING </label>
           </div>
           <div class="flex items-center mr-2 mb-2">
-            <p-radioButton
-              formControlName="status"
-              id="status2"
-              name="status"
-              value="WAITING"
-              class="mr-2"></p-radioButton>
-            <label for="status2" class="rounded-lg drop-shadow-md bg-yellow-600 text-white text-xs py-1 px-2">
-              WAITING
-            </label>
+            <p-radioButton formControlName="status" value="IN_PROGRESS" class="mr-2"></p-radioButton>
+            <label class="rounded-lg drop-shadow-md bg-yellow-600 text-white text-xs py-1 px-2"> IN PROGRESS </label>
           </div>
           <div class="flex items-center mr-2 mb-2">
-            <p-radioButton formControlName="status" id="status1" name="status" value="NEW" class="mr-2"></p-radioButton>
-            <label for="status1" class="rounded-lg drop-shadow-md bg-green-500 text-white text-xs py-1 px-2">
-              DONE
-            </label>
+            <p-radioButton formControlName="status" value="DONE" class="mr-2"></p-radioButton>
+            <label class="rounded-lg drop-shadow-md bg-green-500 text-white text-xs py-1 px-2"> DONE </label>
           </div>
           <div class="flex items-center mb-2">
-            <p-radioButton
-              formControlName="status"
-              id="status3"
-              name="status"
-              value="CANCEL"
-              class="mr-2"></p-radioButton>
-            <label for="status3" class="rounded-lg drop-shadow-md bg-red-500 text-white text-xs py-1 px-2">
-              CANCEL
-            </label>
+            <p-radioButton formControlName="status" value="CANCEL" class="mr-2"></p-radioButton>
+            <label class="rounded-lg drop-shadow-md bg-red-500 text-white text-xs py-1 px-2"> CANCEL </label>
           </div>
         </div>
         <small *ngIf="isSubmitted && treatmentForm.controls['status'].errors" class="p-error block mt-2">

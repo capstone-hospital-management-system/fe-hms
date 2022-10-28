@@ -27,10 +27,10 @@
     <ng-template pTemplate="header">
       <tr>
         <th class="text-sm">ID</th>
-        <th class="text-sm">Name</th>
-        <th class="text-sm">Desciption</th>
-        <th class="text-sm">Price</th>
-        <th class="text-sm">Stock</th>
+        <th class="text-sm">Clinic</th>
+        <th class="text-sm">Appointment Date</th>
+        <th class="text-sm">Patient</th>
+        <th class="text-sm">Doctor</th>
         <th class="text-sm">Actions</th>
       </tr>
     </ng-template>
@@ -50,16 +50,16 @@
           {{ appointment.id }}
         </td>
         <td class="text-sm">
-          {{ appointment.name }}
+          {{ appointment.clinic.name }}
         </td>
         <td class="text-sm">
-          {{ appointment.description }}
+          {{ appointment.appointment_date | date: 'dd-MM-yyyy HH:mm:ss' }}
         </td>
         <td class="text-sm">
-          {{ appointment.price | currency: 'IDR' }}
+          {{ appointment.patient.username }}
         </td>
         <td class="text-sm">
-          {{ appointment.stock }}
+          {{ appointment.doctor.username }}
         </td>
         <td>
           <button
@@ -105,6 +105,7 @@
         <p class="text-sm mb-2">Clinic</p>
         <p-dropdown
           formControlName="clinic_id"
+          appendTo="body"
           inputId="clinic_id"
           optionLabel="name"
           optionValue="id"
@@ -142,14 +143,15 @@
         <p class="text-sm mb-2">Patient</p>
         <p-dropdown
           formControlName="patient_id"
+          appendTo="body"
           inputId="patient_id"
-          optionLabel="name"
+          optionLabel="username"
           optionValue="id"
-          filterBy="name"
+          filterBy="username"
           placeholder="Select Patient"
           styleClass="p-dropdown-sm w-full"
           [filter]="true"
-          [options]="clinicList"
+          [options]="patientList"
           [showClear]="true"
           [ngClass]="{
             'ng-invalid ng-dirty': isSubmitted && appointmentForm.controls['patient_id'].errors
@@ -163,14 +165,15 @@
         <p class="text-sm mb-2">Doctor</p>
         <p-dropdown
           formControlName="doctor_id"
+          appendTo="body"
           inputId="doctor_id"
-          optionLabel="name"
+          optionLabel="username"
           optionValue="id"
-          filterBy="name"
+          filterBy="username"
           placeholder="Select Doctor"
           styleClass="p-dropdown-sm w-full"
           [filter]="true"
-          [options]="clinicList"
+          [options]="accountList"
           [showClear]="true"
           [ngClass]="{
             'ng-invalid ng-dirty': isSubmitted && appointmentForm.controls['doctor_id'].errors
