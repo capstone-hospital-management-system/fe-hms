@@ -204,6 +204,16 @@ export const navigations: INavigations = {
       title: 'Homepage',
     },
     {
+      url: '/dashboard/patients',
+      routerLinkActiveOptions: defaultRouterLinkActiveOptions,
+      queryParams: {
+        page: 1,
+        per_page: 5,
+      },
+      icon: 'pi pi-users',
+      title: 'Patients',
+    },
+    {
       url: '/dashboard/appointments',
       routerLinkActiveOptions: defaultRouterLinkActiveOptions,
       queryParams: {
@@ -254,13 +264,14 @@ export const navigations: INavigations = {
 //     treatments (crud),
 //   ],
 //   nurse: [
-//     medicines (crud),
-//     treatments (crud),
 //     clinics (crud),
+//     treatments (crud),
+//     medicines (crud),
 //   ],
 //   receptionist: [
-//     appointment (crud),
+//     patients (crud),
 //     clinics (crud),
+//     appointment (crud),
 //     prescription (crud),
 //     bills (crud),
 //   ],
