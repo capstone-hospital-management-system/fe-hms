@@ -18,6 +18,7 @@ export interface IAccountInfo {
   password: string;
   phone_number: string;
   username: string;
+  role: string;
 }
 
 export interface ILoginResponseDTO {
