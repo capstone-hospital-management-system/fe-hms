@@ -1,36 +1,27 @@
-export interface ILoginRequest {
-  username: string;
+export interface ILoginRequestDTO {
+  username_or_email: string;
   password: string;
 }
 
-export interface ILoginResponse {
-  data: {
-    access_token: string;
-    token_type: string;
-  };
-  status: number;
-  message: string;
-}
-
-export interface IRegisterRequest {
-  username: string;
+export interface IAccountInfo {
+  accountNonExpired: boolean;
+  accountNonLocked: boolean;
+  authorities: { authority: string }[];
+  credentialsNonExpired: boolean;
   email: string;
-  phone: string;
-  name: string;
-  id_card: string;
-  address: string;
-  password: string;
-}
-
-export interface IAdminInfo {
+  enabled: boolean;
+  first_name: string;
   id: number;
+  id_card: string;
+  last_name: string;
+  others: any;
+  password: string;
+  phone_number: string;
   username: string;
-  email: string;
-  phone: string;
-  idCard: string;
-  name: string;
-  address: string;
-  password?: string;
-  created_at: number;
-  updated_at: number;
+}
+
+export interface ILoginResponseDTO {
+  access_token: string;
+  token_type: string;
+  account_info: IAccountInfo;
 }

@@ -3,7 +3,7 @@
     .p-button-sm {
       padding: 0.5rem 1rem;
     }
-    
+
     .p-button-label {
       padding-left: 0;
     }
@@ -15,7 +15,7 @@
     .p-input-icon-left > .p-inputtext {
       padding-left: 2.5rem;
     }
-    
+
     .p-dropdown-sm {
       .p-inputtext {
         @apply text-sm;
@@ -27,7 +27,7 @@
         @apply text-sm;
       }
     }
-    
+
     .p-dropdown .p-dropdown-label.p-placeholder {
       color: #999999;
     }
@@ -37,7 +37,7 @@
         height: 2rem;
         font-size: 14px;
       }
-      
+
       .p-paginator .p-paginator-first, .p-paginator .p-paginator-prev, .p-paginator .p-paginator-next, .p-paginator .p-paginator-last {
         height: 2rem;
       }

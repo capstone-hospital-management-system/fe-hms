@@ -1,0 +1,272 @@
+<p-toast></p-toast>
+<p-confirmDialog [baseZIndex]="3" styleClass="md:max-w-[30vw]"></p-confirmDialog>
+
+<div class="container p-5">
+  <div class="flex mb-5">
+    <div class="mr-4">
+      <button
+        pButton
+        label="New Account"
+        icon="pi pi-plus"
+        class="p-button-success p-button-sm"
+        (click)="onAddPreview()"></button>
+    </div>
+    <div *ngIf="false" class="mr-auto">
+      <button pButton label="Bulk Delete" icon="pi pi-trash" class="p-button-danger p-button-sm"></button>
+    </div>
+    <!-- <button pButton label="Export" icon="pi pi-upload" class="p-button-help p-button-sm" (click)="onExport()"></button> -->
+  </div>
+
+  <p-table
+    #dt
+    dataKey="id"
+    responsiveLayout="scroll"
+    [value]="accounts"
+    [rows]="perPage"
+    [rowHover]="!isAccountListLoading"
+    [rowsPerPageOptions]="[5, 10, 25, 50, 100]">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="text-sm">ID</th>
+        <th class="text-sm">Username</th>
+        <th class="text-sm">Firstname</th>
+        <th class="text-sm">Lastname</th>
+        <th class="text-sm">Email</th>
+        <th class="text-sm">Phone Number</th>
+        <th class="text-sm">ID Card</th>
+        <th class="text-sm">Role</th>
+        <th class="text-sm">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-account>
+      <tr *ngIf="isAccountListLoading">
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+      </tr>
+
+      <tr *ngIf="!isAccountListLoading">
+        <td class="text-sm">
+          {{ account.id }}
+        </td>
+        <td class="text-sm">
+          {{ account.username }}
+        </td>
+        <td class="text-sm">
+          {{ account.first_name }}
+        </td>
+        <td class="text-sm">
+          {{ account.last_name }}
+        </td>
+        <td class="text-sm">
+          {{ account.email }}
+        </td>
+        <td class="text-sm">
+          {{ account.phone_number }}
+        </td>
+        <td class="text-sm">
+          {{ account.id_card }}
+        </td>
+        <td class="text-sm">
+          {{ account.role }}
+        </td>
+        <td>
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-warning p-button-sm mr-2"
+            [loading]="account.id === selectedAccountId && isAccountDetailLoading"
+            (click)="onEditPreview(account)"></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-danger p-button-sm"
+            [disabled]="isDeleteLoading"
+            [loading]="account.id === selectedAccountId && isDeleteLoading"
+            (click)="onDeletePreview(account.id)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-paginator
+    class="custom-pagination"
+    styleClass="mt-4"
+    [rows]="perPage"
+    [totalRecords]="totalData"
+    [rowsPerPageOptions]="[5, 10, 25, 50, 100]"
+    (onPageChange)="onChangePage($event)"></p-paginator>
+
+  <p-dialog
+    [header]="selectedAccountId ? 'Edit Account' : 'New Account'"
+    position="top"
+    responsiveLayout="scroll"
+    [(visible)]="isAccountFormVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="!isSubmitLoading"
+    [style]="{ width: '100%', 'max-width': '30vw' }"
+    (onHide)="onHideForm()">
+    <form [formGroup]="accountForm" class="grid gap-4" style="padding-top: 1px" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <p class="text-sm mb-2">Username</p>
+        <input
+          formControlName="username"
+          id="username"
+          type="text"
+          pInputText
+          placeholder="Username"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && accountForm.controls['username'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && accountForm.controls['username'].errors" class="p-error block mt-1">
+          Username is required!
+        </small>
+      </div>
+
+      <div class="field">
+        <p class="text-sm mb-2">Firstname</p>
+        <input
+          formControlName="first_name"
+          id="first_name"
+          type="text"
+          pInputText
+          placeholder="Firstname"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && accountForm.controls['first_name'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && accountForm.controls['first_name'].errors" class="p-error block mt-1">
+          Firstname is required!
+        </small>
+      </div>
+
+      <div class="field">
+        <p class="text-sm mb-2">Lastname</p>
+        <input
+          formControlName="last_name"
+          id="last_name"
+          type="text"
+          pInputText
+          placeholder="Lastname"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && accountForm.controls['last_name'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && accountForm.controls['last_name'].errors" class="p-error block mt-1">
+          Lastname is required!
+        </small>
+      </div>
+
+      <div class="field">
+        <p class="text-sm mb-2">Email</p>
+        <input
+          formControlName="email"
+          id="email"
+          type="email"
+          pInputText
+          placeholder="Email"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && accountForm.controls['email'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && accountForm.controls['email'].errors" class="p-error block mt-1">
+          Email is required!
+        </small>
+      </div>
+
+      <div class="field">
+        <p class="text-sm mb-2">ID Card</p>
+        <input
+          formControlName="id_card"
+          id="id_card"
+          type="text"
+          pInputText
+          placeholder="ID Card"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && accountForm.controls['id_card'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && accountForm.controls['id_card'].errors" class="p-error block mt-1">
+          ID Card is required!
+        </small>
+      </div>
+
+      <div class="field">
+        <p class="text-sm mb-2">Role</p>
+        <p-dropdown
+          formControlName="role"
+          appendTo="body"
+          [options]="roles"
+          id="role"
+          type="select"
+          placeholder="Role"
+          styleClass="p-dropdown-sm w-full"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && accountForm.controls['role'].errors
+          }"
+          class="w-full"></p-dropdown>
+        <small *ngIf="isSubmitted && accountForm.controls['role'].errors" class="p-error block mt-1">
+          Role is required!
+        </small>
+      </div>
+
+      <div class="field">
+        <p class="text-sm mb-2">Phone</p>
+        <input
+          formControlName="phone_number"
+          id="phone_number"
+          type="text"
+          pInputText
+          placeholder="Phone"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && accountForm.controls['phone_number'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small
+          *ngIf="isSubmitted && accountForm.controls['phone_number'].errors"
+          id="phone_number"
+          class="p-error block mt-1">
+          Phone is required!
+        </small>
+      </div>
+
+      <div class="field">
+        <p class="text-sm mb-2">Password</p>
+        <input
+          formControlName="password"
+          id="password"
+          type="password"
+          pInputText
+          placeholder="Password"
+          [ngClass]="{
+            'ng-invalid ng-dirty': isSubmitted && accountForm.controls['password'].errors
+          }"
+          class="p-inputtext-sm w-full" />
+        <small *ngIf="isSubmitted && accountForm.controls['password'].errors" class="p-error block mt-1">
+          Password is required!
+        </small>
+      </div>
+
+      <div class="text-end mt-7">
+        <button
+          pButton
+          label="Save"
+          type="submit"
+          class="p-button-primary p-button-sm py-2 px-10"
+          [loading]="isSubmitLoading"></button>
+      </div>
+    </form>
+  </p-dialog>
+</div>

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule, formatDate } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -14,7 +15,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CalendarModule } from 'primeng/calendar';
 
-import { IPatientResponseDTO } from '../dtos/IPatientDTO';
+import { IPatientRequestDTO, IPatientResponseDTO } from '../dtos/IPatientsDTO';
+import { PatientsService } from '../services/patients.service';
+import { patientFields } from '../models/patients';
+import { BloodTypes } from '../models/blood-types';
+import { Genders } from '../models/genders';
 
 @Component({
   selector: 'app-patients',
@@ -35,27 +40,11 @@ import { IPatientResponseDTO } from '../dtos/IPatientDTO';
     InputTextareaModule,
     CalendarModule,
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, PatientsService],
 })
 export class PatientsComponent implements OnInit {
-  // private ngUnsubsribe: Subject<any> = new Subject();
-  patientForm: FormGroup = new FormGroup({
-    username: new FormControl('', Validators.required),
-    first_name: new FormControl('', Validators.required),
-    last_name: new FormControl('', Validators.required),
-    id_card: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
-    age: new FormControl('', [Validators.required, Validators.pattern('^[0-9]*$')]),
-    gender: new FormControl('', Validators.required),
-    address: new FormControl('', Validators.required),
-    city: new FormControl('', Validators.required),
-    blood_type: new FormControl('', Validators.required),
-    bod: new FormControl('', Validators.required),
-    phone_number: new FormControl('', Validators.required),
-    postal_code: new FormControl('', Validators.required),
-    register_date: new FormControl(new Date(), Validators.required),
-    register_by: new FormControl('', Validators.required),
-    updated_by: new FormControl('', Validators.required),
-  });
+  private ngUnsubsribe: Subject<any> = new Subject();
+  patientForm: FormGroup = new FormGroup({});
   isPatientFormVisible: boolean = false;
   patients: IPatientResponseDTO[] = [];
   selectedPatientId: number | undefined;
@@ -64,6 +53,8 @@ export class PatientsComponent implements OnInit {
   isPatientListLoading: boolean = false;
   isPatientDetailLoading: boolean = false;
   isDeleteLoading: boolean = false;
+  bloodTypes: BloodTypes[] = [];
+  genders: Genders[] = [];
 
   currentPage: number = 1;
   perPage: number = 5;
@@ -73,57 +64,62 @@ export class PatientsComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private formBuilder: FormBuilder,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private patientsService: PatientsService
   ) {}
 
   ngOnInit(): void {
+    patientFields.forEach(field => {
+      const formControl: FormControl = new FormControl('');
+      if (field.isRequired) {
+        formControl.addValidators(Validators.required);
+      }
+      if (field.regexPattern) {
+        formControl.addValidators(Validators.pattern(field.regexPattern));
+      }
+      this.patientForm.addControl(field.key, formControl);
+    });
+
     let queryParams = {};
     this.activatedRoute.queryParams.subscribe(params => {
       queryParams = params;
     });
     this.onGetPatients(queryParams);
+    this.bloodTypes = Object.values(BloodTypes);
+    this.genders = Object.values(Genders);
   }
 
   onGetPatients(params?: { [key: string]: string | number }): void {
-    // this.isPatientListLoading = true;
-    // this.patientsService
-    //   .httpGetPatients(params)
-    //   .pipe(takeUntil(this.ngUnsubsribe))
-    //   .subscribe(res => {
-    //     this.patients = res.data;
-    //     this.totalData = res.meta.total_data;
-    //     this.isPatientListLoading = false;
-    //   });
-    // console.log(params);
-
-    // Hanya untuk testing
-    this.patients = [
-      {
-        id: 1,
-        username: 'Username',
-        first_name: 'Firstname',
-        last_name: 'Lastname',
-        id_card: 333327346287364,
-        age: 23,
-        gender: 'MALE',
-        address: 'Address Street',
-        city: 'Ghost City',
-        blood_type: 'B',
-        bod: new Date(),
-        phone_number: '087739999776',
-        postal_code: 24456,
-        register_date: new Date(),
-        register_by: 1,
-        updated_by: 1,
-        created_at: new Date(),
-        updated_at: new Date(),
-      },
-    ];
+    const queryParams = {
+      page: params ? params['page'] : this.currentPage,
+      size: params ? params['per_page'] : this.perPage,
+    };
+    this.isPatientListLoading = true;
+    this.patientsService
+      .get(queryParams)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.patients = res.data;
+          this.totalData = res.meta?.total_data as number;
+          this.isPatientListLoading = false;
+        },
+        error: error => {
+          console.error(error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
+          this.isPatientListLoading = false;
+        },
+      });
   }
 
   onChangePage(pagination: { page: number; first: number; rows: number; pageCount: number }): void {
+    this.currentPage = pagination.page + 1;
+    this.perPage = pagination.rows;
     let queryParams: { page: number; per_page: number; sort?: string } = {
       page: pagination.page + 1,
       per_page: pagination.rows,
@@ -141,16 +137,8 @@ export class PatientsComponent implements OnInit {
     this.isSubmitted = false;
   }
 
-  onExport(): void {
-    // this.patientsService
-    //   .httpGetPatientExcel()
-    //   .pipe(takeUntil(this.ngUnsubsribe))
-    //   .subscribe(blob => {
-    //     saveAs(blob, 'patients.xlsx');
-    //   });
-  }
-
   onAddPreview(): void {
+    this.selectedPatientId = undefined;
     this.onToggleForm();
     this.patientForm.reset();
   }
@@ -158,6 +146,9 @@ export class PatientsComponent implements OnInit {
   onEditPreview(patient: IPatientResponseDTO): void {
     this.selectedPatientId = patient.id;
     this.patientForm.patchValue(patient);
+    this.patientForm.patchValue({
+      bod: new Date(patient.bod),
+    });
     this.onToggleForm();
   }
 
@@ -172,20 +163,24 @@ export class PatientsComponent implements OnInit {
       acceptLabel: 'Delete',
       acceptButtonStyleClass: 'p-button-outlined p-button-danger p-button-sm',
       accept: () => {
-        // this.isDeleteLoading = true;
-        // this.patientsService
-        //   .httpDeletePatient(id)
-        //   .pipe(takeUntil(this.ngUnsubsribe))
-        //   .subscribe(() => {
-        //     this.isDeleteLoading = false;
-        //     this.messageService.add({
-        //       severity: 'success',
-        //       summary: 'Success',
-        //       detail: 'Patient Deleted!',
-        //     });
-        //     this.selectedPatientId = undefined;
-        //     this.onGetPatients();
-        //   });
+        this.isDeleteLoading = true;
+        this.patientsService
+          .delete(id)
+          .pipe(takeUntil(this.ngUnsubsribe))
+          .subscribe({
+            next: () => {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Patient Deleted!',
+              });
+              this.selectedPatientId = undefined;
+              this.onGetPatients();
+            },
+            complete: () => {
+              this.isDeleteLoading = false;
+            },
+          });
       },
       rejectLabel: 'Cancel',
       rejectButtonStyleClass: 'p-button-primary p-button-sm',
@@ -197,24 +192,36 @@ export class PatientsComponent implements OnInit {
 
   onSubmit() {
     this.isSubmitted = true;
-    console.log(this.patientForm.value);
-    // if (this.patientForm.invalid) return;
-    // this.isSubmitLoading = true;
-    // const payload: IPatient = this.patientForm.value;
-    // const httpSubmitService = this.selectedPatient
-    //   ? this.patientsService.httpUpdatePatient(this.selectedPatient.id, payload)
-    //   : this.patientsService.httpCreatePatient(payload);
-    // httpSubmitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe(() => {
-    //   this.isSubmitted = false;
-    //   this.isSubmitLoading = false;
-    //   this.onToggleForm();
-    //   this.patientForm.reset();
-    //   this.messageService.add({
-    //     severity: 'success',
-    //     summary: 'Success',
-    //     detail: this.selectedPatient ? 'Patient Updated!' : 'Patient Created!',
-    //   });
-    //   this.onGetPatients();
-    // });
+    if (this.patientForm.invalid) return;
+    this.isSubmitLoading = true;
+    const payload: IPatientRequestDTO = this.patientForm.value;
+    const dateOfBirth = new Date(payload.bod);
+    payload.bod = formatDate(dateOfBirth, 'yyyy-MM-dd HH:mm:dd', 'en-US');
+    const submitService = this.selectedPatientId
+      ? this.patientsService.update(this.selectedPatientId, payload)
+      : this.patientsService.create(payload);
+    submitService.pipe(takeUntil(this.ngUnsubsribe)).subscribe({
+      next: () => {
+        this.isSubmitted = false;
+        this.isSubmitLoading = false;
+        this.onToggleForm();
+        this.patientForm.reset();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: this.selectedPatientId ? 'Patient Updated!' : 'Patient Created!',
+        });
+        this.onGetPatients();
+      },
+      error: error => {
+        console.error(error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed!',
+          detail: error,
+        });
+        this.isSubmitLoading = false;
+      },
+    });
   }
 }

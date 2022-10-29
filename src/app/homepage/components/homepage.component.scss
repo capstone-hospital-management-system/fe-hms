@@ -1,0 +1,9 @@
+:host {
+  ::ng-deep {
+    .homepage {
+      .p-card-body {
+        @apply py-0;
+      }
+    }
+  }
+}

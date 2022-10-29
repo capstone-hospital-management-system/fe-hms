@@ -1,0 +1,268 @@
+<p-toast></p-toast>
+<p-confirmDialog [baseZIndex]="3" styleClass="md:max-w-[30vw]"></p-confirmDialog>
+
+<div class="container p-5">
+  <div class="flex mb-5">
+    <div class="mr-4">
+      <button
+        pButton
+        label="New Prescription"
+        icon="pi pi-plus"
+        class="p-button-success p-button-sm"
+        (click)="onAddPreview()"></button>
+    </div>
+    <div *ngIf="false" class="mr-auto">
+      <button pButton label="Bulk Delete" icon="pi pi-trash" class="p-button-danger p-button-sm"></button>
+    </div>
+  </div>
+
+  <p-table
+    #dt
+    dataKey="id"
+    responsiveLayout="scroll"
+    [value]="prescriptions"
+    [rows]="perPage"
+    [rowHover]="!isPrescriptionListLoading"
+    [rowsPerPageOptions]="[5, 10, 25, 50, 100]">
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="text-sm">ID</th>
+        <th class="text-sm">Diagnose</th>
+        <th class="text-sm">Desciption</th>
+        <th class="text-sm">Others</th>
+        <th class="text-sm">Status</th>
+        <th class="text-sm">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-prescription>
+      <tr *ngIf="isPrescriptionListLoading">
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+        <td><p-skeleton></p-skeleton></td>
+      </tr>
+
+      <tr *ngIf="!isPrescriptionListLoading">
+        <td class="text-sm">
+          {{ prescription.id }}
+        </td>
+        <td class="text-sm">
+          {{ prescription.diagnose.name }}
+        </td>
+        <td class="text-sm">
+          {{ prescription.description }}
+        </td>
+        <td class="text-sm">
+          {{ prescription.others ?? '-' }}
+        </td>
+        <td class="text-sm">
+          <span
+            *ngIf="prescription.status === 'DONE'"
+            class="rounded-lg drop-shadow-md bg-green-500 text-white py-2 px-4">
+            {{ prescription.status }}
+          </span>
+          <span
+            *ngIf="prescription.status === 'WAITING_PAYMENT'"
+            class="rounded-lg drop-shadow-md bg-yellow-500 text-white py-2 px-4">
+            WAITING_PAYMENT
+          </span>
+          <span
+            *ngIf="prescription.status === 'CANCEL'"
+            class="rounded-lg drop-shadow-md bg-red-500 text-white py-2 px-4">
+            {{ prescription.status }}
+          </span>
+        </td>
+        <td>
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-warning p-button-sm mr-2"
+            [disabled]="isDeleteLoading"
+            [loading]="prescription.id === selectedPrescriptionId && isPrescriptionDetailLoading"
+            (click)="onEditPreview(prescription)"></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-danger p-button-sm"
+            [disabled]="isDeleteLoading"
+            [loading]="prescription.id === selectedPrescriptionId && isDeleteLoading"
+            (click)="onDeletePreview(prescription.id)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-paginator
+    class="custom-pagination"
+    styleClass="mt-4"
+    [rows]="perPage"
+    [totalRecords]="totalData"
+    [rowsPerPageOptions]="[5, 10, 25, 50, 100]"
+    (onPageChange)="onChangePage($event)"></p-paginator>
+
+  <p-dialog
+    [header]="selectedPrescriptionId ? 'Edit Prescription' : 'New Prescription'"
+    position="top"
+    responsiveLayout="scroll"
+    [(visible)]="isPrescriptionFormVisible"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [closable]="!isSubmitLoading"
+    [style]="{ width: '100%', 'max-width': '50vw' }"
+    (onHide)="onHideForm()">
+    <form [formGroup]="prescriptionForm" style="padding-top: 1px" (ngSubmit)="onSubmit()">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="grid gap-3">
+          <div class="field">
+            <p class="text-sm mb-2">Diagnose</p>
+            <p-dropdown
+              formControlName="diagnose_id"
+              appendTo="body"
+              inputId="diagnose_id"
+              optionLabel="name"
+              optionValue="id"
+              filterBy="name"
+              placeholder="Select Diagnose"
+              styleClass="p-dropdown-sm w-full"
+              [filter]="true"
+              [options]="diagnoseList"
+              [showClear]="true"
+              [ngClass]="{
+                'ng-invalid ng-dirty': isSubmitted && prescriptionForm.controls['diagnose_id'].errors
+              }">
+            </p-dropdown>
+            <small *ngIf="isSubmitted && prescriptionForm.controls['diagnose_id'].errors" class="p-error block mt-1">
+              Diagnose is required!
+            </small>
+          </div>
+          <div *ngIf="selectedPrescriptionId" class="field">
+            <p class="text-sm mb-2">Status</p>
+            <div class="flex flex-wrap align-middle">
+              <div class="flex items-center mr-2 mb-2">
+                <p-radioButton
+                  formControlName="status"
+                  id="status1"
+                  name="status"
+                  value="DONE"
+                  class="mr-2"></p-radioButton>
+                <label for="status1" class="rounded-lg drop-shadow-md bg-green-500 text-white text-xs py-1 px-2">
+                  DONE
+                </label>
+              </div>
+              <div class="flex items-center mr-2 mb-2">
+                <p-radioButton
+                  formControlName="status"
+                  id="status2"
+                  name="status"
+                  value="WAITING_PAYMENT"
+                  class="mr-2"></p-radioButton>
+                <label for="status2" class="rounded-lg drop-shadow-md bg-yellow-600 text-white text-xs py-1 px-2">
+                  WAITING_PAYMENT
+                </label>
+              </div>
+              <div class="flex items-center mb-2">
+                <p-radioButton
+                  formControlName="status"
+                  id="status3"
+                  name="status"
+                  value="CANCEL"
+                  class="mr-2"></p-radioButton>
+                <label for="status3" class="rounded-lg drop-shadow-md bg-red-500 text-white text-xs py-1 px-2">
+                  CANCEL
+                </label>
+              </div>
+            </div>
+            <small *ngIf="isSubmitted && prescriptionForm.controls['status'].errors" class="p-error block mt-2">
+              Status is required!
+            </small>
+          </div>
+          <div class="field">
+            <p class="text-sm mb-2">Description</p>
+            <textarea
+              pInputTextarea
+              formControlName="description"
+              id="description"
+              type="text"
+              [rows]="5"
+              [cols]="30"
+              placeholder="Description"
+              [ngClass]="{
+                'ng-invalid ng-dirty': isSubmitted && prescriptionForm.controls['description'].errors
+              }"
+              class="p-inputtext-sm w-full"></textarea>
+            <small *ngIf="isSubmitted && prescriptionForm.controls['description'].errors" class="p-error block">
+              Description is required!
+            </small>
+          </div>
+          <div class="field">
+            <p class="text-sm mb-2">Others</p>
+            <textarea
+              pInputTextarea
+              formControlName="others"
+              id="others"
+              type="text"
+              [rows]="5"
+              [cols]="30"
+              placeholder="Others"
+              [ngClass]="{
+                'ng-invalid ng-dirty': isSubmitted && prescriptionForm.controls['others'].errors
+              }"
+              class="p-inputtext-sm w-full"></textarea>
+            <small *ngIf="isSubmitted && prescriptionForm.controls['others'].errors" class="p-error block">
+              Others is required!
+            </small>
+          </div>
+        </div>
+        <div formArrayName="medicine_ids" class="field">
+          <p class="text-sm">Medicines</p>
+          <div
+            *ngFor="let medicineField of medicineIds.controls; let medicineFieldIndex = index"
+            class="flex align-middle mt-2">
+            <p-dropdown
+              [formControlName]="medicineFieldIndex"
+              appendTo="body"
+              [inputId]="'medicine-' + medicineFieldIndex"
+              optionLabel="name"
+              optionValue="id"
+              filterBy="name"
+              placeholder="Select Medicine"
+              class="grow mr-3"
+              styleClass="p-dropdown-sm w-full"
+              [filter]="true"
+              [options]="medicineList"
+              [showClear]="true">
+            </p-dropdown>
+            <button
+              pButton
+              icon="pi pi-trash"
+              type="button"
+              class="p-button-danger p-button-sm"
+              (click)="onRemoveMedicine(medicineFieldIndex)"></button>
+          </div>
+          <button
+            pButton
+            label="Add Medicine"
+            type="button"
+            class="p-button-success p-button-sm w-full py-2 px-10 mt-3"
+            (click)="onAddMedicine()"></button>
+          <small *ngIf="isSubmitted && prescriptionForm.controls['medicine_ids'].errors" class="p-error block mt-2">
+            Medicines are required!
+          </small>
+        </div>
+      </div>
+
+      <div class="text-end mt-7">
+        <button
+          pButton
+          label="Save"
+          type="submit"
+          class="p-button-primary p-button-sm py-2 px-10"
+          [loading]="isSubmitLoading"></button>
+      </div>
+    </form>
+  </p-dialog>
+</div>

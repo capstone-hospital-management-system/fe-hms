@@ -1,4 +1,16 @@
 <p-toast></p-toast>
-<div class="h-screen">
-  <p>homepage works!</p>
+<div class="homepage grid grid-cols-4 gap-4 p-5">
+  <p-card *ngFor="let statistic of statistics">
+    <ng-template pTemplate="header">
+      <div class="p-5 pb-0">
+        <h1 class="text-lg">
+          <i [className]="statistic.icon + ' text-lg mr-2'"></i>
+          {{ statistic.label }}
+        </h1>
+      </div>
+    </ng-template>
+    <h2 class="text-xl text-indigo-500">
+      {{ statistic.count }}
+    </h2>
+  </p-card>
 </div>
