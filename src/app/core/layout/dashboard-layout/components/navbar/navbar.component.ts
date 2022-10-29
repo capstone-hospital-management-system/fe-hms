@@ -2,29 +2,19 @@ import { Component, DoCheck, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { AvatarModule } from 'primeng/avatar';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { Subject, takeUntil } from 'rxjs';
 
+import { IAccountResponseDTO } from 'src/app/accounts/dtos/IAccountsDTO';
 import { SessionService } from 'src/app/auth/services/session/session.service';
-
-// Hanya untuk sample
-interface IAdmin {
-  id: number;
-  username: string;
-  email: string;
-  phone: string;
-  idCard: string;
-  name: string;
-  address: string;
-  password?: string;
-  created_at: number;
-  updated_at: number;
-}
+import { AccountsService } from 'src/app/accounts/services/accounts.service';
+import { IAccountInfo } from 'src/app/auth/dtos/IAuth';
 
 @Component({
   selector: 'app-navbar',
@@ -40,70 +30,63 @@ interface IAdmin {
     DialogModule,
     ProgressSpinnerModule,
   ],
+  providers: [MessageService, SessionService, AccountsService],
 })
 export class NavbarComponent implements OnInit, DoCheck {
-  // private ngUnsubscribe: Subject<any> = new Subject();
+  private ngUnsubsribe: Subject<any> = new Subject();
   breadcrumbHome!: MenuItem;
   breadcrumbItems: MenuItem[] = [];
-  selectedAdmin: IAdmin | undefined;
-  isAdminLoading: boolean = false;
+  myProfile: IAccountResponseDTO | undefined = undefined;
   isProfileVisible: boolean = false;
+  isProfileLoading: boolean = false;
 
-  constructor(private title: Title, private router: Router, private sessionService: SessionService) {}
+  constructor(
+    private title: Title,
+    private router: Router,
+    private messageService: MessageService,
+    private sessionService: SessionService,
+    private accountsService: AccountsService
+  ) {}
 
   ngOnInit(): void {
     this.breadcrumbHome = { label: 'Dashboard', routerLink: '/dashboard' };
-    this.selectedAdmin = {
-      id: 1,
-      username: 'username',
-      email: 'email@email.com',
-      phone: '087739999776',
-      idCard: '333789183486242',
-      name: 'Full Name',
-      address: 'Address Street',
-      password: 'password',
-      created_at: 1666256299516,
-      updated_at: 1666256299516,
-    };
   }
 
   ngDoCheck(): void {
     this.breadcrumbItems = [{ label: this.title.getTitle(), disabled: true }];
   }
 
-  onToggleProfileModal(): void {
-    // const adminInfo = localStorage.getItem('admin_info') ?? null;
-
-    // if (!adminInfo) return;
-
-    this.isProfileVisible = !this.isProfileVisible;
-
-    // if (this.isProfileVisible) {
-    //   const parseAdminInfo = JSON.parse(adminInfo) as IAdmin;
-
-    //   this.isAdminLoading = true;
-
-    //   this.adminsService
-    //     .httpGetAdminDetail(parseAdminInfo.id)
-    //     .pipe(takeUntil(this.ngUnsubscribe))
-    //     .subscribe(res => {
-    //       const { id_card: idCard, ...rest } = res.data;
-    //       this.selectedAdmin = { ...rest, idCard };
-    //       this.isAdminLoading = false;
-    //     });
-    // }
+  getCredential(): IAccountInfo {
+    return this.sessionService.getSession();
   }
 
-  getCredential(): { initialName: string; name: string } {
-    const currentSession = this.sessionService.getSession();
+  onGetProfile(): void {
+    this.isProfileLoading = true;
+    this.accountsService
+      .getById(this.getCredential().id)
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: res => {
+          this.myProfile = res.data;
+          this.isProfileLoading = false;
+        },
+        error: error => {
+          console.error(error);
+          this.isProfileLoading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Failed!',
+            detail: error,
+          });
+        },
+      });
+  }
 
-    if (!currentSession) return { initialName: 'U', name: 'unknown user' };
-
-    const credentialData = {
-      initialName: currentSession.username.charAt(0).toUpperCase(),
-      name: currentSession.username,
-    };
-    return credentialData;
+  onToggleProfileModal(): void {
+    this.isProfileVisible = !this.isProfileVisible;
+    if (this.isProfileVisible) {
+      this.onGetProfile();
+    }
   }
 
   onLogout(): void {

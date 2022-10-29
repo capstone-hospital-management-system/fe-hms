@@ -6,12 +6,11 @@ import { MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
-import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 
 import { AuthService } from '../../services/auth/auth.service';
 import { SessionService } from '../../services/session/session.service';
-import { IAccountResponseDTO, ILoginRequestDTO, ILoginResponseDTO } from '../../dtos/IAuth';
-import { IBaseResponseDTO } from 'src/app/core/dtos/IBaseResponseDTO';
+import { IAccountInfo } from '../../dtos/IAuth';
 
 @Component({
   selector: 'app-login',
@@ -60,7 +59,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  onShowSuccessLogin(selectedAdmin: IAccountResponseDTO): void {
+  onShowSuccessLogin(selectedAdmin: IAccountInfo): void {
     this.messageService.add({
       severity: 'success',
       summary: 'Login Success!',

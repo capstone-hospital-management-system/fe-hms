@@ -1,6 +1,6 @@
-import { IPatientResponseDTO } from './../../patients/dtos/IPatientsDTO';
+import { IAccountResponseDTO } from 'src/app/accounts/dtos/IAccountsDTO';
 import { IClinicResponseDTO } from 'src/app/clinics/dtos/IClinicsDTO';
-import { IAccountResponseDTO } from 'src/app/auth/dtos/IAuth';
+import { IPatientResponseDTO } from 'src/app/patients/dtos/IPatientsDTO';
 
 export interface IAppointment {
   clinic: IClinicResponseDTO;

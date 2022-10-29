@@ -1,5 +1,3 @@
-import { Roles } from '../models/role';
-
 export interface IAccount {
   first_name: string;
   last_name: string;

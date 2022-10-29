@@ -1,7 +1,6 @@
 import { Observable, of } from 'rxjs';
 import { Injectable } from '@angular/core';
-
-import { IAccountResponseDTO } from 'src/app/auth/dtos/IAuth';
+import { IAccountInfo } from '../../dtos/IAuth';
 
 @Injectable({
   providedIn: 'root',
@@ -9,11 +8,11 @@ import { IAccountResponseDTO } from 'src/app/auth/dtos/IAuth';
 export class SessionService {
   constructor() {}
 
-  createSession(account: IAccountResponseDTO): void {
+  createSession(account: IAccountInfo): void {
     sessionStorage.setItem('account_info', JSON.stringify(account));
   }
 
-  getSession(): IAccountResponseDTO {
+  getSession(): IAccountInfo {
     return JSON.parse(sessionStorage.getItem('account_info') as string);
   }
 
