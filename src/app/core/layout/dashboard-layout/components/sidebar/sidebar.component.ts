@@ -3,8 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { DividerModule } from 'primeng/divider';
 
+import { IAccountInfo } from 'src/app/auth/dtos/IAuth';
+import { SessionService } from 'src/app/auth/services/session/session.service';
 import { INavigationMenu } from './ISidebar';
-import { navigations } from './sidebarNavigation';
+import { INavigations, navigations } from './sidebarNavigation';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,13 +14,20 @@ import { navigations } from './sidebarNavigation';
   styleUrls: ['./sidebar.component.scss'],
   standalone: true,
   imports: [CommonModule, RouterModule, DividerModule],
+  providers: [SessionService],
 })
 export class SidebarComponent implements OnInit {
   navigations: INavigationMenu[] = [];
 
-  constructor() {}
+  constructor(private sessionService: SessionService) {}
 
   ngOnInit(): void {
-    this.navigations = navigations.admin;
+    if (!this.getCredential()) return;
+    const role = this.getCredential().authorities[0].authority.toLowerCase();
+    this.navigations = navigations[role as keyof INavigations];
+  }
+
+  getCredential(): IAccountInfo {
+    return this.sessionService.getSession();
   }
 }
