@@ -2,29 +2,78 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.3.
 
-## Development server
+## Screenshot Apps
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+### Login
 
-## Code scaffolding
+![Login](src/assets/screenshots/login-page.png)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### Homepage
 
-## Build
+![Homepage](src/assets/screenshots/homepage.png)
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Accounts
 
-## Running unit tests
+![Accounts Read](src/assets/screenshots/accounts-read.png)
+![Accounts Create](src/assets/screenshots/accounts-create.png)
+![Accounts Update](src/assets/screenshots/accounts-update.png)
+![Accounts Delete](src/assets/screenshots/accounts-delete.png)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Patients
 
-## Running end-to-end tests
+![Patients Read](src/assets/screenshots/patients-read.png)
+![Patients Create](src/assets/screenshots/patients-create.png)
+![Patients Update](src/assets/screenshots/patients-update.png)
+![Patients Delete](src/assets/screenshots/patients-delete.png)
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Clinics
 
-## Further help
+![Clinics Read](src/assets/screenshots/clinics-read.png)
+![Clinics Create](src/assets/screenshots/clinics-create.png)
+![Clinics Update](src/assets/screenshots/clinics-update.png)
+![Clinics Delete](src/assets/screenshots/clinics-delete.png)
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Appointments
+
+![Appointments Read](src/assets/screenshots/appointments-read.png)
+![Appointments Create](src/assets/screenshots/appointments-create.png)
+![Appointments Update](src/assets/screenshots/appointments-update.png)
+![Appointments Delete](src/assets/screenshots/appointments-delete.png)
+
+### Diagnoses
+
+![Diagnoses Read](src/assets/screenshots/diagnoses-read.png)
+![Diagnoses Create](src/assets/screenshots/diagnoses-create.png)
+![Diagnoses Update](src/assets/screenshots/diagnoses-update.png)
+![Diagnoses Delete](src/assets/screenshots/diagnoses-delete.png)
+
+### Treatments
+
+![Treatments Read](src/assets/screenshots/treatments-read.png)
+![Treatments Create](src/assets/screenshots/treatments-create.png)
+![Treatments Update](src/assets/screenshots/treatments-update.png)
+![Treatments Delete](src/assets/screenshots/treatments-delete.png)
+
+### Medicines
+
+![Medicines Read](src/assets/screenshots/medicines-read.png)
+![Medicines Create](src/assets/screenshots/medicines-create.png)
+![Medicines Update](src/assets/screenshots/medicines-update.png)
+![Medicines Delete](src/assets/screenshots/medicines-delete.png)
+
+### Prescriptions
+
+![Prescriptions Read](src/assets/screenshots/prescriptions-read.png)
+![Prescriptions Create](src/assets/screenshots/prescriptions-create.png)
+![Prescriptions Update](src/assets/screenshots/prescriptions-update.png)
+![Prescriptions Delete](src/assets/screenshots/prescriptions-delete.png)
+
+### Bills
+
+![Bills Read](src/assets/screenshots/bills-read.png)
+![Bills Create](src/assets/screenshots/bills-create.png)
+![Bills Update](src/assets/screenshots/bills-update.png)
+![Bills Delete](src/assets/screenshots/bills-delete.png)
 
 ## How To Create New Issue
 
