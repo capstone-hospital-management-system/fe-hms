@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
+// import { concatMap, delay, of, Subject, Subscription, takeUntil } from 'rxjs';
+// import { webSocket } from 'rxjs/webSocket';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -54,6 +56,8 @@ export class MedicinesComponent implements OnInit {
   isMedicineDetailLoading: boolean = false;
   isDeleteLoading: boolean = false;
 
+  // wsSubject = webSocket('ws://localhost:8080/notification');
+
   currentPage: number = 1;
   perPage: number = 5;
   totalPage: number = 1;
@@ -84,6 +88,10 @@ export class MedicinesComponent implements OnInit {
       queryParams = params;
     });
     this.onGetMedicines(queryParams);
+
+    // this.wsSubject.pipe(concatMap(item => of(item).pipe(delay(1000)))).subscribe(data => {
+    //   console.log(data);
+    // });
   }
 
   onGetMedicines(params?: { [key: string]: string | number }): void {

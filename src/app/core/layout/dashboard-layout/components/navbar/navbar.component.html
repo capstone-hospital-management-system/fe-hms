@@ -4,7 +4,41 @@
       <p-breadcrumb [home]="breadcrumbHome" [model]="breadcrumbItems"></p-breadcrumb>
     </div>
     <div class="flex-none">
-      <p-overlayPanel #op>
+      <p-overlayPanel #opNotification>
+        <ng-template pTemplate>
+          <div class="max-w-[300px]">
+            <ng-container *ngIf="notifications.length">
+              <div class="max-h-[200px] overflow-scroll">
+                <div
+                  *ngFor="let notification of notifications; let notificationIndex = index"
+                  [ngClass]="{
+                    'hover:bg-indigo-50 hover:cursor-pointer py-3 px-4': true,
+                    'border-t': notificationIndex > 0
+                  }">
+                  <h1 class="text-base capitalize mb-2">{{ notification.title.toLowerCase() }}</h1>
+                  <p class="text-sm">{{ notification.description }}</p>
+                </div>
+              </div>
+              <div class="border-t text-right">
+                <p-button
+                  label="mark as read"
+                  styleClass="p-button-sm p-button-text p-1"
+                  (click)="onMarkAsRead()"></p-button>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="!notifications.length">
+              <p class="text-sm p-5">empty notification</p>
+            </ng-container>
+          </div>
+        </ng-template>
+      </p-overlayPanel>
+      <p-button
+        icon="pi pi-bell"
+        [badge]="notifications.length.toString()"
+        styleClass="p-button-sm p-button-text"
+        class="mr-3"
+        (click)="opNotification.toggle($event)"></p-button>
+      <p-overlayPanel #opProfile>
         <ng-template pTemplate>
           <div class="w-[150px] p-2">
             <div>
@@ -28,7 +62,7 @@
           </div>
         </ng-template>
       </p-overlayPanel>
-      <button class="p-0 transition duration-150 ease-in-out" (click)="op.toggle($event)">
+      <button class="p-0 transition duration-150 ease-in-out" (click)="opProfile.toggle($event)">
         <div class="flex items-center">
           <p-avatar
             [label]="getCredential() ? getCredential().username.charAt(0) : 'U'"
