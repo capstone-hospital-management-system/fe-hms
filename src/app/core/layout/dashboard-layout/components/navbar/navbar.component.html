@@ -3,7 +3,7 @@
     <div class="grow">
       <p-breadcrumb [home]="breadcrumbHome" [model]="breadcrumbItems"></p-breadcrumb>
     </div>
-    <div class="flex-none">
+    <div class="flex items-center">
       <p-overlayPanel #opNotification>
         <ng-template pTemplate>
           <div class="max-w-[300px]">
@@ -35,7 +35,7 @@
       <p-button
         icon="pi pi-bell"
         [badge]="notifications.length.toString()"
-        styleClass="p-button-sm p-button-text"
+        styleClass="p-button-sm p-button-text w-auto py-1 px-2"
         class="mr-3"
         (click)="opNotification.toggle($event)"></p-button>
       <p-overlayPanel #opProfile>
