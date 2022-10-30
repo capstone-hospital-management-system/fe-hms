@@ -1,8 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import * as SockJS from 'sockjs-client';
-import { over } from 'stompjs';
 
 import { environment } from 'src/environments/environment';
 import { IBaseResponseDTO } from 'src/app/core/dtos/IBaseResponseDTO';
@@ -34,5 +32,11 @@ export class PatientsService {
 
   delete(id: number): Observable<IBaseResponseDTO<any[]>> {
     return this.http.delete<IBaseResponseDTO<any[]>>(`${this.url}/${id}`);
+  }
+
+  downloadExcel(): Observable<any> {
+    return this.http.get(`${this.url}/download-excel`, {
+      responseType: 'blob',
+    });
   }
 }

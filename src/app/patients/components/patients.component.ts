@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, formatDate } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
+import { saveAs } from 'file-saver-es';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -56,6 +57,7 @@ export class PatientsComponent implements OnInit {
   isPatientListLoading: boolean = false;
   isPatientDetailLoading: boolean = false;
   isDeleteLoading: boolean = false;
+  isExportLoading: boolean = false;
   bloodTypes: BloodTypes[] = [];
   genders: Genders[] = [];
 
@@ -239,5 +241,22 @@ export class PatientsComponent implements OnInit {
         this.isSubmitLoading = false;
       },
     });
+  }
+
+  onExportExcel(): void {
+    this.isExportLoading = true;
+    this.patientsService
+      .downloadExcel()
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: blob => {
+          saveAs(blob, 'patients.xlsx');
+          this.isExportLoading = false;
+        },
+        error: error => {
+          console.error(error);
+          this.isExportLoading = false;
+        },
+      });
   }
 }
