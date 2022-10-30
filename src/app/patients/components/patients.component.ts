@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule, formatDate } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
+import { saveAs } from 'file-saver-es';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -15,6 +16,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { CalendarModule } from 'primeng/calendar';
 
+import { SessionService } from 'src/app/auth/services/session/session.service';
 import { IPatientRequestDTO, IPatientResponseDTO } from '../dtos/IPatientsDTO';
 import { PatientsService } from '../services/patients.service';
 import { patientFields } from '../models/patients';
@@ -40,7 +42,7 @@ import { Genders } from '../models/genders';
     InputTextareaModule,
     CalendarModule,
   ],
-  providers: [MessageService, ConfirmationService, PatientsService],
+  providers: [MessageService, ConfirmationService, PatientsService, SessionService],
 })
 export class PatientsComponent implements OnInit {
   private ngUnsubsribe: Subject<any> = new Subject();
@@ -48,11 +50,14 @@ export class PatientsComponent implements OnInit {
   isPatientFormVisible: boolean = false;
   patients: IPatientResponseDTO[] = [];
   selectedPatientId: number | undefined;
+  registerBy: number | undefined;
+  updatedBy: number | undefined;
   isSubmitted: boolean = false;
   isSubmitLoading: boolean = false;
   isPatientListLoading: boolean = false;
   isPatientDetailLoading: boolean = false;
   isDeleteLoading: boolean = false;
+  isExportLoading: boolean = false;
   bloodTypes: BloodTypes[] = [];
   genders: Genders[] = [];
 
@@ -66,7 +71,8 @@ export class PatientsComponent implements OnInit {
     private router: Router,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private patientsService: PatientsService
+    private patientsService: PatientsService,
+    private sessionService: SessionService
   ) {}
 
   ngOnInit(): void {
@@ -139,12 +145,16 @@ export class PatientsComponent implements OnInit {
 
   onAddPreview(): void {
     this.selectedPatientId = undefined;
+    this.registerBy = this.sessionService.getSession().id;
+    this.updatedBy = this.sessionService.getSession().id;
     this.onToggleForm();
     this.patientForm.reset();
   }
 
   onEditPreview(patient: IPatientResponseDTO): void {
     this.selectedPatientId = patient.id;
+    this.registerBy = patient.register_by ? patient.register_by.id : this.sessionService.getSession().id;
+    this.updatedBy = this.sessionService.getSession().id;
     this.patientForm.patchValue(patient);
     this.patientForm.patchValue({
       bod: new Date(patient.bod),
@@ -197,6 +207,12 @@ export class PatientsComponent implements OnInit {
     const payload: IPatientRequestDTO = this.patientForm.value;
     const dateOfBirth = new Date(payload.bod);
     payload.bod = formatDate(dateOfBirth, 'yyyy-MM-dd HH:mm:dd', 'en-US');
+    payload.register_by = {
+      id: this.registerBy as number,
+    };
+    payload.updated_by = {
+      id: this.updatedBy as number,
+    };
     const submitService = this.selectedPatientId
       ? this.patientsService.update(this.selectedPatientId, payload)
       : this.patientsService.create(payload);
@@ -204,6 +220,8 @@ export class PatientsComponent implements OnInit {
       next: () => {
         this.isSubmitted = false;
         this.isSubmitLoading = false;
+        this.registerBy = undefined;
+        this.updatedBy = undefined;
         this.onToggleForm();
         this.patientForm.reset();
         this.messageService.add({
@@ -223,5 +241,22 @@ export class PatientsComponent implements OnInit {
         this.isSubmitLoading = false;
       },
     });
+  }
+
+  onExportExcel(): void {
+    this.isExportLoading = true;
+    this.patientsService
+      .downloadExcel()
+      .pipe(takeUntil(this.ngUnsubsribe))
+      .subscribe({
+        next: blob => {
+          saveAs(blob, 'patients.xlsx');
+          this.isExportLoading = false;
+        },
+        error: error => {
+          console.error(error);
+          this.isExportLoading = false;
+        },
+      });
   }
 }

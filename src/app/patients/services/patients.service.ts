@@ -33,4 +33,10 @@ export class PatientsService {
   delete(id: number): Observable<IBaseResponseDTO<any[]>> {
     return this.http.delete<IBaseResponseDTO<any[]>>(`${this.url}/${id}`);
   }
+
+  downloadExcel(): Observable<any> {
+    return this.http.get(`${this.url}/download-excel`, {
+      responseType: 'blob',
+    });
+  }
 }

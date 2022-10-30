@@ -23,6 +23,7 @@ import { AccountsService } from 'src/app/accounts/services/accounts.service';
 import { PatientsService } from 'src/app/patients/services/patients.service';
 import { IPatientResponseDTO } from 'src/app/patients/dtos/IPatientsDTO';
 import { SessionService } from 'src/app/auth/services/session/session.service';
+import { Roles } from 'src/app/accounts/models/role';
 import { AppointmentsService } from '../services/appointments.service';
 import { IAppointmentRequestDTO, IAppointmentResponseDTO } from '../dtos/IAppointmentsDTO';
 import { appointmentFields } from '../models/appointments';
@@ -191,7 +192,7 @@ export class AppointmentsComponent implements OnInit {
       .pipe(takeUntil(this.ngUnsubsribe))
       .subscribe({
         next: res => {
-          this.accountList = res.data;
+          this.accountList = res.data.filter(account => account.role === Roles.DOCTOR);
         },
         error: error => {
           console.error(error);

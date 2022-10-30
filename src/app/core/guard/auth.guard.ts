@@ -19,7 +19,9 @@ export class AuthGuard implements CanActivate, CanLoad {
 
   checkLogin(route: ActivatedRouteSnapshot): boolean {
     if (this.sessionService.isLogin()) {
-      const currentRole = this.sessionService.getSession().authorities[0].authority.toUpperCase();
+      const currentRole = this.sessionService.getSession()
+        ? this.sessionService.getSession().authorities[0].authority.toUpperCase()
+        : '';
       if (route.data['roles'] && route.data['roles'].indexOf(currentRole) === -1) {
         this.router.navigateByUrl('/auth/login');
         return false;

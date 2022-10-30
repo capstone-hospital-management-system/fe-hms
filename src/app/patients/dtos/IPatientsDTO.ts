@@ -11,9 +11,12 @@ export interface IPatient {
   bod: string | Date;
   phone_number: string;
   postal_code: number;
-  //register_date: string | Date;
-  register_by: any;
-  updated_by: any;
+  register_by: {
+    id: number;
+  };
+  updated_by: {
+    id: number;
+  };
 }
 
 export interface IPatientResponseDTO extends IPatient {
