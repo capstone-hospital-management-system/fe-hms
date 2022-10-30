@@ -8,13 +8,19 @@
         pButton
         label="New Patient"
         icon="pi pi-plus"
-        class="p-button-success p-button-sm"
+        class="p-button-success p-button-sm mr-3"
         (click)="onAddPreview()"></button>
+      <button
+        pButton
+        label="Export Excel"
+        icon="pi pi-cloud-download"
+        [loading]="isExportLoading"
+        class="p-button-sm"
+        (click)="onExportExcel()"></button>
     </div>
     <div *ngIf="false" class="mr-auto">
       <button pButton label="Bulk Delete" icon="pi pi-trash" class="p-button-danger p-button-sm"></button>
     </div>
-    <!-- <button pButton label="Export" icon="pi pi-upload" class="p-button-help p-button-sm" (click)="onExport()"></button> -->
   </div>
 
   <p-table
