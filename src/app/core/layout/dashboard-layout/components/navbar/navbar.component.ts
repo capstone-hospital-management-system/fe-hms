@@ -59,7 +59,7 @@ export class NavbarComponent implements OnInit, DoCheck {
     this.websocketService.subscribeNotification('/topic/messages', (event: any): any => {
       const wsBody = JSON.parse(event.body);
       console.log(wsBody);
-      this.notifications.push(wsBody);
+      this.notifications.unshift(wsBody);
     });
   }
 
